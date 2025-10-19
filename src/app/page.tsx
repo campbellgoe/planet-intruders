@@ -1,5 +1,5 @@
 "use client"
-import App from "@/components/App";
+import App from "@/PlanetApp";
 
 
 export default function Home() {
