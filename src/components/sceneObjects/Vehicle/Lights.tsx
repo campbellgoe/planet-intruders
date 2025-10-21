@@ -28,8 +28,8 @@ const defaultLightOptions = {
   color: "#ffffff",
   intensity: 1,
   distance: 30,
-  angle: 1,
-  penumbra: 0.236,
+  angle: 1.5,
+  penumbra: 0.0236,
   decay: 1,
   position: [0, 0, 0] as Triplet
 };
@@ -90,7 +90,7 @@ const Light = ({
           light={spotlightRef?.current || undefined}
         />
       )} */}
-
+<ambientLight intensity={0.009}/>
       <spotLight
         castShadow
         ref={spotlightRef}
