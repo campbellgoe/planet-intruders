@@ -1,6 +1,7 @@
+"use client";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from '@react-three/drei'
-import PlanetMesh from "./planet";
+import PlanetMesh from "./components/sceneObjects/Planet";
 const SceneLighting = () => {
   return <>
     <ambientLight intensity={0.04} />
