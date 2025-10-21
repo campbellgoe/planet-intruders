@@ -1,5 +1,5 @@
 import GroupKeyNote, { GroupKeyNoteProps } from "./GroupKeyNote";
-import MultipleKeyNote, { MultipeKeyNoteProps } from "./MultipleKeyNote";
+import MultipleKeyNote, { MultipeKeyNoteProps } from "./MultipleKeyNotes";
 import PlaceholderNote, { PlaceholderNoteProps } from "./PlaceholderNote";
 import SingleKeyNote, { SingleKeyNoteProps } from "./SingleKeyNote";
 import Note, { NoteProps } from "./Note";

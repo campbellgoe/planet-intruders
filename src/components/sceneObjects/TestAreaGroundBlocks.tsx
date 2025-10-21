@@ -1,4 +1,4 @@
-import Cube from "components/scene-objects/Cube";
+import Cube from "@/components/sceneObjects/Cube";
 import { useRef } from "react";
 import { Object3D } from "three";
 

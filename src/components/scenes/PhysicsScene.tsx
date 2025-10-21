@@ -1,12 +1,12 @@
-import Cube from "components/scene-objects/Cube";
-import Pillar from "components/scene-objects/Pillar";
-import TestAreaBlockWalls from "components/scene-objects/TestAreaBlockWalls";
-import TestAreaBrickWallWithColumns from "components/scene-objects/TestAreaBrickWallWithColumns";
-import TestAreaGroundBlocks from "components/scene-objects/TestAreaGroundBlocks";
-import TestAreaSurface from "components/scene-objects/TestAreaSurface";
-import Vehicle from "components/scene-objects/Vehicle";
+import Cube from "@/components/sceneObjects/Cube";
+import Pillar from "@/components/sceneObjects/Pillar";
+import TestAreaBlockWalls from "@/components/sceneObjects/TestAreaBlockWalls";
+import TestAreaBrickWallWithColumns from "@/components/sceneObjects/TestAreaBrickWallWithColumns";
+import TestAreaGroundBlocks from "@/components/sceneObjects/TestAreaGroundBlocks";
+import TestAreaSurface from "@/components/sceneObjects/TestAreaSurface";
+import Vehicle from "@/components/sceneObjects/Vehicle/Vehicle";
 import { useMemo } from "react";
-import Heightfield, { generateHeightmap } from "./scene-objects/HeightField";
+import Heightfield, { generateHeightmap } from "@/components/sceneObjects/HeightField";
 
 const PhysicsScene = () => {
   const sideScale = 100;

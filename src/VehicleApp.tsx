@@ -1,3 +1,4 @@
+"use client";
 import { CameraControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import HUD from "./components/HUD/HUD";
@@ -7,7 +8,7 @@ import { CameraIdProvider } from "./components/sceneObjects/CameraContext";
 import { ControlsContext, useControls } from "./hooks/useControls";
 import { Suspense, useRef, useState } from "react";
 import { Vector3 } from "three";
-import "./styles.css";
+import "./style.css";
 
 const App = () => {
   // const [cameraFOV, setCameraFOV] = useState(75);

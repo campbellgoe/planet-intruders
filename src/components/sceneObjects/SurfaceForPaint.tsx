@@ -28,7 +28,7 @@ import {
   CompoundBodyProps,
   Triplet,
   useCompoundBody
-} from "use-cannon";
+} from "@react-three/cannon";
 import {
   CHASSIS,
   CUBE,

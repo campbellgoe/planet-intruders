@@ -1,5 +1,5 @@
 import { Triplet } from "@react-three/cannon";
-import SurfaceForPaint from "components/scene-objects/SurfaceForPaint";
+import SurfaceForPaint from "@/components/sceneObjects/SurfaceForPaint";
 
 const TestAreaSurface = ({
   width = 3,

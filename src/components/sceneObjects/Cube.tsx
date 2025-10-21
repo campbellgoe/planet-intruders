@@ -1,5 +1,5 @@
 import { Mesh } from "three";
-import { BoxProps, CollideEvent, Triplet, useBox } from "use-cannon";
+import { BoxProps, CollideEvent, Triplet, useBox } from "@react-three/cannon";
 import {
   CHASSIS,
   CUBE,

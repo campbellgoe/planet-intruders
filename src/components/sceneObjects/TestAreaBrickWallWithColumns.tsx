@@ -1,6 +1,6 @@
 import { Triplet, useContactMaterial } from "@react-three/cannon";
-import Cube from "components/scene-objects/Cube";
-import TestAreaBrickWall from "components/scene-objects/TestAreaBrickWall";
+import Cube from "@/components/sceneObjects/Cube";
+import TestAreaBrickWall from "@/components/sceneObjects/TestAreaBrickWall";
 import {
   Material as CannonMaterial,
   ContactMaterial as CannonContactMaterial

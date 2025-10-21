@@ -1,5 +1,5 @@
 import { Triplet } from "@react-three/cannon";
-import Cube from "components/scene-objects/Cube";
+import Cube from "@/components/sceneObjects/Cube";
 import { useMemo } from "react";
 import { Material as PhysicsMaterial } from "cannon-es";
 

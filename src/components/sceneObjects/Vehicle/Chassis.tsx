@@ -1,5 +1,5 @@
 import { PerspectiveCamera, useGLTF } from "@react-three/drei";
-import { ControlsContext, useControls } from "hooks/useControls";
+import { ControlsContext, useControls } from "@/hooks/useControls";
 import {
   forwardRef,
   useContext,
@@ -15,7 +15,7 @@ import {
   useBox,
   useCompoundBody,
   useTrimesh
-} from "use-cannon";
+} from "@react-three/cannon";
 import {
   CHASSIS,
   CUBE,
@@ -23,8 +23,8 @@ import {
   SURFACE_FOR_PAINT,
   WHEEL
 } from "../ObjectCollisionTypes";
-import Light from "./Light";
-import { CompoundBodyProps, CylinderProps } from "use-cannon";
+import Light from "./Lights";
+import { CompoundBodyProps, CylinderProps } from "@react-three/cannon";
 import { useCameraId } from "../CameraContext";
 import { useFrame } from "@react-three/fiber";
 

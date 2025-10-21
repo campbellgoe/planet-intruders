@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { ControlsContext, useControls } from "hooks/useControls";
+import { ControlsContext, useControls } from "@/hooks/useControls";
 import { v4 as uuidv4 } from "uuid";
 import KeymapNotes, { KeymapItem } from "./KeymapNotes";
 

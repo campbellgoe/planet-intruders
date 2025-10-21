@@ -1,4 +1,4 @@
-import { BoxProps, Triplet, useBox } from "use-cannon";
+import { BoxProps, Triplet, useBox } from "@react-three/cannon";
 
 type SurfaceSceneObjectProps = BoxProps &
   Partial<{

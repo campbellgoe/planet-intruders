@@ -1,7 +1,7 @@
-import { Triplet, useRaycastVehicle, WheelInfoOptions } from "use-cannon";
+import { Triplet, useRaycastVehicle, WheelInfoOptions } from "@react-three/cannon";
 
 import { useFrame } from "@react-three/fiber";
-import { ControlsContext, useControls } from "hooks/useControls";
+import { ControlsContext, useControls } from "@/hooks/useControls";
 import { useContext, useRef, useState } from "react";
 import { Object3D, Vector3 } from "three";
 import Chassis from "./Chassis";

@@ -1,4 +1,4 @@
-import { PlaneProps, usePlane } from "use-cannon";
+import { PlaneProps, usePlane } from "@react-three/cannon";
 
 type PlaneSceneObjectProps = Partial<{
   width: number;

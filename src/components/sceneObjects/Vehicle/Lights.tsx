@@ -1,7 +1,7 @@
-import { ControlsContext, useControls } from "hooks/useControls";
+import { ControlsContext, useControls } from "@/hooks/useControls";
 import { useContext, useRef, useState } from "react";
 import { Object3D, SpotLight } from "three";
-import { BoxProps, Triplet, Quad } from "use-cannon";
+import { BoxProps, Triplet, Quad } from "@react-three/cannon";
 
 type LightProps = BoxProps & {
   name?: string;

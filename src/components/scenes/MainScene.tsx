@@ -5,9 +5,9 @@ import {
   Stats
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import PhysicsScene from "components/PhysicsScene";
-import { ControlsContext, useControls } from "hooks/useControls";
-import { useIsFirstRender } from "hooks/useIsFirstRender";
+import PhysicsScene from "@/components/scenes/PhysicsScene";
+import { ControlsContext, useControls } from "@/hooks/useControls";
+import { useIsFirstRender } from "@/hooks/useIsFirstRender";
 import { Perf } from "r3f-perf";
 import {
   RefObject,
@@ -19,8 +19,8 @@ import {
 } from "react";
 import { ArrowHelper, ColorRepresentation, Vector3, VSMShadowMap } from "three";
 import { PerspectiveCamera } from "@react-three/drei";
-import { Debug as CannonDebugger, Physics } from "use-cannon";
-import { useCameraId } from "./scene-objects/CameraContext";
+import { Debug as CannonDebugger, Physics } from "@react-three/cannon";
+import { useCameraId } from "@/components/sceneObjects/CameraContext";
 // import { EffectComposer, Bloom } from "@react-three/postprocessing";
 
 export const DebuggerColorIdByName = {

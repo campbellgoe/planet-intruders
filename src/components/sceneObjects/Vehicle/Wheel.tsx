@@ -3,8 +3,8 @@ import { Euler, useFrame, Vector3 } from "@react-three/fiber";
 import {
   useInfoRecords,
   useInfoRecordsDispatch
-} from "components/HUD/InfoPanelContext";
-import { ControlsContext, useControls } from "hooks/useControls";
+} from "@/components/HUD/InfoPanelContext";
+import { ControlsContext, useControls } from "@/hooks/useControls";
 import { forwardRef, Ref, useContext, useState } from "react";
 import {
   ArrowHelper,
@@ -19,7 +19,7 @@ import {
   CompoundBodyProps,
   CylinderProps,
   useCompoundBody
-} from "use-cannon";
+} from "@react-three/cannon";
 import {
   CHASSIS,
   CUBE,

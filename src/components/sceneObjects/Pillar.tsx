@@ -1,5 +1,5 @@
 import { BufferGeometry, Material, Mesh } from "three";
-import { CylinderProps, useCylinder } from "use-cannon";
+import { CylinderProps, useCylinder } from "@react-three/cannon";
 import {
   CHASSIS,
   CUBE,
