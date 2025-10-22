@@ -20,13 +20,15 @@ const App = () => {
   const [cameraTarget, setCameraTarget] = useState(new Vector3(2.2, -3.6, 0.6));
   const CameraControlsRef = useRef<CameraControls>(null);
 
-  const onChangeCamera = (e?: { [x: string]: any; type: "controlend" }) => {
+  const onChangeCamera = (e?: any) => {
     if (!e) {
       return;
     }
 
     const eventTarget = e.target as CameraControls;
+    // @ts-ignore
     setCameraPosition(eventTarget.getPosition(new Vector3()));
+    // @ts-ignore
     setCameraTarget(eventTarget.getTarget(new Vector3()));
   };
 
@@ -59,8 +61,8 @@ const App = () => {
                 // gl={{ antialias: true, logarithmicDepthBuffer: true }}
               >
                 {/* <PerspectiveCamera
-                makeDefault={currentCameraId === "static"}
                 fov={cameraFOV}
+                makeDefault={currentCameraId === "static"}
                 position={cameraPosition}
               /> */}
 

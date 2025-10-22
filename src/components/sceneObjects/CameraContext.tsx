@@ -8,14 +8,14 @@ import {
 } from "react";
 
 const cameraIds = {
-  static: "static" as const,
+  reversing: "reversing" as const,
   following: "following" as const
 };
 const cameraIdsAsArray = Object.values(cameraIds);
 
 export type CameraId = keyof typeof cameraIds;
 
-const initialCameraId: CameraId = "static";
+const initialCameraId: CameraId = "reversing";
 
 const CameraContext = createContext<CameraId>(initialCameraId);
 const CameraDispatchContext = createContext<React.Dispatch<CameraAction>>(
@@ -45,9 +45,9 @@ export function CameraIdProvider({ children }: CameraProviderProps) {
   const { changeCamera } = useControls();
 
   useEffect(() => {
-    if (!changeCamera) {
-      return;
-    }
+    // if (!changeCamera) {
+    //   return;
+    // }
 
     let cameraIndex = cameraIdsAsArray.findIndex((id) => id === cameraId);
     if (cameraIndex === -1) {

@@ -209,9 +209,9 @@ const Chassis = forwardRef(
 
     useFrame(() => {
       // useLayoutEffect(() => {
-      if (currentCameraId !== "following") {
-        return;
-      }
+      // if (currentCameraId !== "following") {
+      //   return;
+      // }
       const camera = cameraRef?.current as typeof PerspectiveCamera;
       if (!camera) {
         return;
@@ -236,8 +236,8 @@ const Chassis = forwardRef(
       <group ref={ref || undefined} api={api} name="chassis">
         <PerspectiveCamera
           ref={cameraRef}
-          makeDefault={currentCameraId === "following"}
-          position={[0, 2, -8]}
+          makeDefault={currentCameraId === "following" || currentCameraId === "reversing"}
+          position={[0, 2, currentCameraId === "following" ? -8 : 8]}
           // position={cameraPosition}
           // fov={cameraFOV}
           // target={ref?.current?.position || [0, 0, 0]}

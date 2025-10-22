@@ -2,7 +2,6 @@ import { useGLTF } from "@react-three/drei";
 import { Euler, useFrame, Vector3 } from "@react-three/fiber";
 import {
   useInfoRecords,
-  useInfoRecordsDispatch
 } from "@/components/HUD/InfoPanelContext";
 import { ControlsContext, useControls } from "@/hooks/useControls";
 import { forwardRef, Ref, useContext, useState } from "react";
@@ -126,11 +125,12 @@ const Wheel = forwardRef(
 
     const { showWireframe } = useControls();
 
-    (nodes["wheel-all-terrain_1"] as Mesh).material.wireframe = showWireframe;
-    (nodes["wheel-all-terrain_2"] as Mesh).material.wireframe = showWireframe;
+    // @ts-ignore
+    (nodes["wheel-all-terrain_1"] as unknown as Mesh).material.wireframe = showWireframe;
+    // @ts-ignore
+    (nodes["wheel-all-terrain_2"] as unknown as Mesh).material.wireframe = showWireframe;
 
-    const infoRecordsDispatch = useInfoRecordsDispatch();
-    const infoRecords = useInfoRecords();
+    const {dispatch: infoRecordsDispatch, infoRecords} = useInfoRecords();
 
     // const [showSteeringArrowHelpers, setShowSteeringArrowHelpers] = useState(
     //   true

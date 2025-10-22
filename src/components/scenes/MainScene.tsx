@@ -62,7 +62,7 @@ const DayTimes = {
 };
 
 type SceneProps = {
-  cameraControlsRef: RefObject<CameraControls>;
+  cameraControlsRef: RefObject<CameraControls | null>;
   cameraPosition: Vector3;
   cameraTarget: Vector3;
   cameraFOV: number;
@@ -95,9 +95,9 @@ const Scene = ({
   );
 
   useEffect(() => {
-    if (currentCameraId !== "static") {
-      return;
-    }
+    // if (currentCameraId !== "reversing") {
+    //   return;
+    // }
 
     if (!cameraControlsRef.current) {
       return;
@@ -180,12 +180,12 @@ const Scene = ({
 
   return (
     <>
-      {showFPSStats && <Stats />}
-      {showPerfomanceInfo && <Perf position="top-right" />}
+      {showFPSStats && <Stats/>}
+      {showPerfomanceInfo && <Perf position="top-left" />}
 
       <PerspectiveCamera
-        makeDefault={currentCameraId === "static"}
-        position={cameraPosition}
+        makeDefault={currentCameraId === "following" || currentCameraId === "reversing"}
+        position={cameraPosition.toArray()}
         fov={cameraFOV}
       />
       <OrbitControls />
@@ -247,8 +247,8 @@ const Scene = ({
 
       <Physics
         broadphase="SAP"
-        contactEquationRelaxation={4}
-        friction={1e-12}
+        // contactEquationRelaxation={4}
+        // friction={1e-12}
         allowSleep
       >
         {isActiveCurrentCannonDebuggerState && (

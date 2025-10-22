@@ -1,10 +1,9 @@
 import { createContext, useContext, useReducer } from "react";
 
-const InfoRecordsContext = createContext<InfoRecord[]>([]);
-
-const InfoRecordsDispatchContext = createContext<
-  React.Dispatch<InfoPanelAction>
->(null);
+const InfoRecordsContext = createContext<{dispatch: React.Dispatch<InfoPanelAction>, infoRecords: InfoRecord[]}>({
+  dispatch: ()=>null,
+  infoRecords: []
+});
 
 export type InfoRecord = {
   id: string;
@@ -84,18 +83,12 @@ export function InfoRecordsProvider({ children }) {
   );
 
   return (
-    <InfoRecordsContext.Provider value={infoRecords}>
-      <InfoRecordsDispatchContext.Provider value={dispatch}>
+    <InfoRecordsContext.Provider value={{infoRecords, dispatch}}>
         {children}
-      </InfoRecordsDispatchContext.Provider>
     </InfoRecordsContext.Provider>
   );
 }
 
 export function useInfoRecords() {
   return useContext(InfoRecordsContext);
-}
-
-export function useInfoRecordsDispatch() {
-  return useContext(InfoRecordsDispatchContext);
 }
