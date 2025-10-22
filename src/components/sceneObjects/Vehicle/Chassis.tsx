@@ -1,3 +1,4 @@
+"use client";
 import { PerspectiveCamera, useGLTF } from "@react-three/drei";
 import { ControlsContext, useControls } from "@/hooks/useControls";
 import {

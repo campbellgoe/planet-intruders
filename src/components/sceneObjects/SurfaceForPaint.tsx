@@ -1,3 +1,4 @@
+"use client";
 import { ThreeEvent, useFrame, useThree } from "@react-three/fiber";
 import {
   RefObject,

@@ -1,3 +1,4 @@
+"use client";
 import { Triplet, useRaycastVehicle, WheelInfoOptions } from "@react-three/cannon";
 
 import { useFrame } from "@react-three/fiber";

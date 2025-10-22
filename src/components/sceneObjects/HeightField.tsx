@@ -1,3 +1,4 @@
+"use client";
 import type { HeightfieldArgs, Triplet } from "@react-three/cannon";
 import { useHeightfield } from "@react-three/cannon";
 import { Color } from "@react-three/fiber";
@@ -173,7 +174,7 @@ const Heightfield = ({
   }),
   position = [0, 0, 0],
   rotation = [0, 0, 0],
-  color = "gray"
+  color = "gray",
 }: HeightfieldProps) => {
   const heightFieldOptions = {
     args: [

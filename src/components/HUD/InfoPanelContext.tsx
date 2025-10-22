@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useContext, useReducer } from "react";
 
 const InfoRecordsContext = createContext<{dispatch: React.Dispatch<InfoPanelAction>, infoRecords: InfoRecord[]}>({
