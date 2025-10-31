@@ -142,7 +142,15 @@ export const initialControlsState = {
     reset: false,
     lightsOn: true
   },
-
+  coopPlayerUnit: {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+    brake: false,
+    reset: false,
+    lightsOn: true
+  },
   changeCamera: false,
 
   // showWireframe: true, // for debug time
@@ -181,28 +189,51 @@ export function useControls() {
     );
 
   useKeysStateHoldHandler(
-    ["ArrowUp", "w"],
+    ["ArrowUp"],
     (draftKeys, pressed) => void (draftKeys.playerUnit.forward = pressed)
   );
   useKeysStateHoldHandler(
-    ["ArrowDown", "s"],
-    (draftKeys, pressed) => void (draftKeys.playerUnit.backward = pressed)
+    ["w"],
+    (draftKeys, pressed) => void (draftKeys.coopPlayerUnit.forward = pressed)
   );
   useKeysStateHoldHandler(
-    ["ArrowLeft", "a"],
+    ["ArrowDown"],
+    (draftKeys, pressed) => void (draftKeys.playerUnit.backward = pressed)
+  );
+   useKeysStateHoldHandler(
+    ["s"],
+    (draftKeys, pressed) => void (draftKeys.coopPlayerUnit.backward = pressed)
+  );
+  useKeysStateHoldHandler(
+    ["ArrowLeft"],
     (draftKeys, pressed) => void (draftKeys.playerUnit.left = pressed)
   );
   useKeysStateHoldHandler(
-    ["ArrowRight", "d"],
+    ["a"],
+    (draftKeys, pressed) => void (draftKeys.coopPlayerUnit.left = pressed)
+  );
+  useKeysStateHoldHandler(
+    ["ArrowRight"],
     (draftKeys, pressed) => void (draftKeys.playerUnit.right = pressed)
   );
   useKeysStateHoldHandler(
-    [" "], // spacebar key
+    ["d"],
+    (draftKeys, pressed) => void (draftKeys.coopPlayerUnit.right = pressed)
+  );
+  useKeysStateHoldHandler(
+    ["Enter"], // spacebar key
     (draftKeys, pressed) => void (draftKeys.playerUnit.brake = pressed)
   );
   useKeysStateHoldHandler(
+    [" "], // spacebar key
+    (draftKeys, pressed) => void (draftKeys.coopPlayerUnit.brake = pressed)
+  );
+  useKeysStateHoldHandler(
     ["r"],
-    (draftKeys, pressed) => void (draftKeys.playerUnit.reset = pressed)
+    (draftKeys, pressed) => {
+      (draftKeys.coopPlayerUnit.reset = pressed)
+      void (draftKeys.playerUnit.reset = pressed)
+    }
   );
 
   useKeysStateHoldHandler(
@@ -213,9 +244,14 @@ export function useControls() {
   );
 
   useKeysStateToggleHandler(
-    ["l"],
+    ["0"],
     (draftKeys) =>
       void (draftKeys.playerUnit.lightsOn = !draftKeys.playerUnit.lightsOn)
+  );
+   useKeysStateToggleHandler(
+    ["1"],
+    (draftKeys) =>
+      void (draftKeys.coopPlayerUnit.lightsOn = !draftKeys.coopPlayerUnit.lightsOn)
   );
 
   useKeysStateToggleHandler(

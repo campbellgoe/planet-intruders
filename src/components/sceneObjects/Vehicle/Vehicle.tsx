@@ -8,6 +8,7 @@ import Chassis from "./Chassis";
 import Wheel from "./Wheel";
 
 const Vehicle = ({
+  playerIndex = 0,
   wheelRadius = 0.6,
   wheelDepth = 1.2,
   wheelAxisWidth = 1.5,
@@ -205,7 +206,7 @@ const Vehicle = ({
       return;
     }
 
-    const {
+    let {
       forward,
       backward,
       left,
@@ -213,8 +214,15 @@ const Vehicle = ({
       brake,
       reset
     } = controls.playerUnit;
-
+const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coopRight, brake: coopBrake } = controls.coopPlayerUnit
     // moving
+    if(playerIndex === 1){
+      forward = coopForward
+      backward = coopBackward;
+      left = coopLeft
+      right = coopRight;
+      brake = coopBrake;
+    }
     for (let e = 0; e < 8; e++) {
       api.applyEngineForce(
         forward || backward
