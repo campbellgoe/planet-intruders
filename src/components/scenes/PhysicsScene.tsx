@@ -73,7 +73,9 @@ const PhysicsScene = () => {
 
       {/* <Vehicle rotation={[0, -Math.PI / 4, 0]} angularVelocity={[0, 0.5, 0]} /> */}
 
-      <Vehicle rotation={[0, -Math.PI / 4, 0]} position={[0, 2, 0]} />
+      <Vehicle playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} />
+
+       <Vehicle playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} />
 
       {/* debug vehicle wheels */}
       {/* <Cube type='Static'position={[0, 0, 0]} args={[1, 2, 1]} /> */}
