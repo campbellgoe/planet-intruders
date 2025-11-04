@@ -7,7 +7,7 @@ import {
   useRef,
   useState
 } from "react";
-import { Mesh, Vector3 } from "three";
+import { Color, Mesh, Vector3 } from "three";
 import {
   BoxProps,
   CollideEvent,
@@ -27,6 +27,7 @@ import Light from "./Lights";
 import { CompoundBodyProps, CylinderProps } from "@react-three/cannon";
 import { useCameraId } from "../CameraContext";
 import { useFrame } from "@react-three/fiber";
+import { PLAYER_2 } from "../const";
 
 const filePath = "/all-terrain-vehicle-chassis.textured.glb";
 
@@ -34,6 +35,8 @@ const halfMathPI = Math.PI / 2;
 
 type ChassisProps = BoxProps & {
   printCollisionInfo?: boolean;
+  color?: number;
+  playerIndex: number;
 };
 
 const Chassis = forwardRef(
@@ -42,6 +45,8 @@ const Chassis = forwardRef(
       args = [1.65, 0.8, 4],
       mass = 5000,
       printCollisionInfo = false,
+      color = 0xffffff,
+      playerIndex = 0,
       ...props
     }: ChassisProps,
     ref
@@ -120,13 +125,15 @@ const Chassis = forwardRef(
     // const [_boxRef, api] = useBox<Mesh>(() => chassisBoxOptions, ref);
 
     const steelMaterial = materials["Paint.Gray"];
+    steelMaterial.vertexColors = true
+    
     const windowMaterial = materials["Black plastic"];
 
-    const { showWireframe } = useControls();
+    // const { showWireframe } = useControls();
     // const { showWireframe } = useContext(ControlsContext);
 
-    (nodes.Cube002 as Mesh).material.wireframe = showWireframe;
-    (nodes.Cube002_1 as Mesh).material.wireframe = showWireframe;
+    // (nodes.Cube002 as unknown as Mesh).material.wireframe = showWireframe;
+    // (nodes.Cube002_1 as unknown as Mesh).material.wireframe = showWireframe;
 
     const { position } = props;
 
@@ -173,10 +180,16 @@ const Chassis = forwardRef(
       stoplight.lightSurface.emissiveIntensity = 0;
     }
 
-    const {
+    let {
       playerUnit: { forward, backward, brake },
+      coopPlayerUnit: { backward: coopBackward, brake: coopBrake }
       // coopPlayerUnit: { forward: coopForward, backward: coopBackward, brake: coopBrake }
     } = useControls();
+
+    if (playerIndex === PLAYER_2) {
+      backward = coopBackward;
+      brake = coopBrake;
+    }
     // } = useContext(ControlsContext);
     // braking
     if (brake) {
@@ -188,17 +201,16 @@ const Chassis = forwardRef(
       boxSize: [0.05, 0.15, 0.075] as Triplet,
       light: {
         position: [0, -0.5, 0] as Triplet,
-        color: "#ffffff",
+        color: color,
         intensity: 0,
         distance: 3
       },
       lightSurface: {
         borderWidthPercentage: 25,
-        emissiveColor: "#ffffff",
+        emissiveColor: color,
         emissiveIntensity: 0
       }
     };
-
     // reverse moving
     if (backward) {
       reverselight.light.intensity = 1;
@@ -295,7 +307,7 @@ const Chassis = forwardRef(
           name="reverselights-left"
           args={reverselight.boxSize}
           light={reverselight.light}
-          color={reverselight.color}
+          color={(new Color(color+(Math.random()*10-5))).toString()}
           lightSurface={reverselight.lightSurface}
           position={[-0.7, 0.177, -1.97]}
           rotation={[0, Math.PI, 0]}
@@ -304,7 +316,7 @@ const Chassis = forwardRef(
           name="reverselights-right"
           args={reverselight.boxSize}
           light={reverselight.light}
-          color={reverselight.color}
+          color={(new Color(color)).toString()}
           lightSurface={reverselight.lightSurface}
           position={[0.7, 0.177, -1.97]}
           rotation={[0, Math.PI, 0]}

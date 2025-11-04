@@ -2,13 +2,14 @@ import { Triplet, useRaycastVehicle, WheelInfoOptions } from "@react-three/canno
 
 import { useFrame } from "@react-three/fiber";
 import { ControlsContext, useControls } from "@/hooks/useControls";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Object3D, Vector3 } from "three";
 import Chassis from "./Chassis";
 import Wheel from "./Wheel";
+import { PLAYER_1, PLAYER_2} from "../const";
 
 const Vehicle = ({
-  playerIndex = 0,
+  playerIndex = PLAYER_1,
   wheelRadius = 0.6,
   wheelDepth = 1.2,
   wheelAxisWidth = 1.5,
@@ -200,7 +201,15 @@ const Vehicle = ({
 
   // const controls = useContext(ControlsContext);
   const controls = useControls();
-
+  // const actualVelocity = useRef<number[]>(null)
+  // const totalVelocity = useRef<number>(0)
+  // useEffect(() => {
+  //   // @ts-ignore
+  //   chassisRef?.current?.api.velocity.subscribe((v: number[]) => {
+  //     actualVelocity.current = v
+  //     totalVelocity.current = v.reduce((acc, curr) => acc + curr, 0)
+  // })
+  // }, [])
   useFrame(() => {
     if (!controls) {
       return;
@@ -214,9 +223,9 @@ const Vehicle = ({
       brake,
       reset
     } = controls.playerUnit;
-const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coopRight, brake: coopBrake } = controls.coopPlayerUnit
+    const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coopRight, brake: coopBrake } = controls.coopPlayerUnit
     // moving
-    if(playerIndex === 1){
+    if (playerIndex === PLAYER_2) {
       forward = coopForward
       backward = coopBackward;
       left = coopLeft
@@ -231,6 +240,7 @@ const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coo
         e
       );
     }
+    let factor = 0.8
     // /moving
 
     // steering
@@ -239,7 +249,7 @@ const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coo
     for (let s = 0; s < 2; s++) {
       api.setSteeringValue(
         left || right
-          ? steerFrontSecondAxisAngleRad * (left && !right ? +1 : -1)
+          ? steerFrontSecondAxisAngleRad * (left && !right ? +factor : -factor)
           : 0,
         s
       );
@@ -248,7 +258,7 @@ const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coo
     for (let s = 2; s < 4; s++) {
       api.setSteeringValue(
         left || right
-          ? steerFrontFirstAxisesRad * (left && !right ? +1 : -1)
+          ? steerFrontFirstAxisesRad * (left && !right ? +factor : -factor)
           : 0,
         s
       );
@@ -259,7 +269,7 @@ const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coo
     for (let s = 4; s < 6; s++) {
       api.setSteeringValue(
         left || right
-          ? steerRearSecondAxisAngleRad * (left && !right ? +1 : -1)
+          ? steerRearSecondAxisAngleRad * (left && !right ? +factor : -factor)
           : 0,
         s
       );
@@ -268,7 +278,7 @@ const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coo
     for (let s = 6; s < 8; s++) {
       api.setSteeringValue(
         left || right
-          ? steerReaFirstrAxisesRad * (left && !right ? +1 : -1)
+          ? steerReaFirstrAxisesRad * (left && !right ? +factor : -factor)
           : 0,
         s
       );
@@ -313,6 +323,8 @@ const { forward: coopForward, backward: coopBackward, left: coopLeft, right: coo
         angularVelocity={angularVelocity}
         velocity={velocity}
         printCollisionInfo={true} /////////////////////////////////
+        color={props?.color}
+        playerIndex={playerIndex}
       />
 
       {showAxesHelpers && (
