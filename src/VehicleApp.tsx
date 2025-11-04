@@ -3,13 +3,16 @@ import { CameraControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import HUD from "./components/HUD/HUD";
 import { InfoRecordsProvider } from "./components/HUD/InfoPanelContext";
-import Scene from "./components/scenes/MainScene";
+// import Scene from "./components/scenes/MainScene";
 import { CameraIdProvider } from "./components/sceneObjects/CameraContext";
 import { ControlsContext, useControls } from "./hooks/useControls";
-import { Suspense, useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { Vector3 } from "three";
 import "./style.css";
+import LoadingScene from "./components/scenes/LoadingScene";
 
+// import ThreeApp from './Scene'
+const Scene = lazy(() => import("./components/scenes/MainScene"))
 const App = () => {
   // const [cameraFOV, setCameraFOV] = useState(75);
   const [cameraFOV, setCameraFOV] = useState(50);
@@ -58,24 +61,25 @@ const App = () => {
                   fov: cameraFOV
                 }}
                 gl={{ antialias: true }}
-                // gl={{ antialias: true, logarithmicDepthBuffer: true }}
+              // gl={{ antialias: true, logarithmicDepthBuffer: true }}
               >
                 {/* <PerspectiveCamera
                 fov={cameraFOV}
                 makeDefault={currentCameraId === "static"}
                 position={cameraPosition}
               /> */}
-
-                <CameraControls
-                  ref={CameraControlsRef}
-                  onEnd={onChangeCamera}
-                />
-                <Scene
-                  cameraControlsRef={CameraControlsRef}
-                  cameraPosition={cameraPosition}
-                  cameraTarget={cameraTarget}
-                  cameraFOV={cameraFOV}
-                />
+                <Suspense fallback={<LoadingScene />}>
+                  <CameraControls
+                    ref={CameraControlsRef}
+                    onEnd={onChangeCamera}
+                  />
+                  <Scene
+                    cameraControlsRef={CameraControlsRef}
+                    cameraPosition={cameraPosition}
+                    cameraTarget={cameraTarget}
+                    cameraFOV={cameraFOV}
+                  />
+                </Suspense>
               </Canvas>
               <HUD
                 cameraPosition={cameraPosition}
@@ -85,7 +89,7 @@ const App = () => {
           </CameraIdProvider>
         </Suspense>
       </ControlsContext.Provider>
-    </div>
+    </div >
   );
 };
 

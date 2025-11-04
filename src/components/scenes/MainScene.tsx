@@ -6,23 +6,38 @@ import {
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import PhysicsScene from "@/components/scenes/PhysicsScene";
-import { ControlsContext, useControls } from "@/hooks/useControls";
+import { useControls } from "@/hooks/useControls";
 import { useIsFirstRender } from "@/hooks/useIsFirstRender";
 import { Perf } from "r3f-perf";
 import {
   RefObject,
   Suspense,
-  useContext,
   useEffect,
   useRef,
   useState
 } from "react";
-import { ArrowHelper, ColorRepresentation, Vector3, VSMShadowMap } from "three";
+import { ColorRepresentation, Vector3 } from "three";
 import { PerspectiveCamera } from "@react-three/drei";
 import { Debug as CannonDebugger, Physics } from "@react-three/cannon";
 import { useCameraId } from "@/components/sceneObjects/CameraContext";
 // import { EffectComposer, Bloom } from "@react-three/postprocessing";
-
+const hexToRgb = (hex: string): [r: number, g: number, b: number] => {
+  let alpha = false;
+  let h: string | number = hex.slice(hex.startsWith('#') ? 1 : 0);
+  if (h.length === 3) h = [...h].map(x => x + x).join('');
+  else if (h.length === 8) alpha = true;
+  h = parseInt(h, 16);
+  return [
+    (h >>> (alpha ? 24 : 16))
+    ,
+    ((h & (alpha ? 0x00ff0000 : 0x00ff00)) >>> (alpha ? 16 : 8))
+    ,
+    ((h & (alpha ? 0x0000ff00 : 0x0000ff)) >>> (alpha ? 8 : 0))
+    ,
+    ]
+    // (alpha ? `, ${h & 0x000000ff}` : '')
+  //);
+};
 export const DebuggerColorIdByName = {
   Black: 1 as const,
   White: 2 as const,
@@ -53,8 +68,8 @@ const Colors = {
 type ColorKeys = keyof typeof Colors;
 type ColorValues = typeof Colors[ColorKeys];
 
-type DayTime = "morning" | "day" | "evening" | "night";
-const DayTimes = {
+export type DayTime = "morning" | "day" | "evening" | "night";
+export const DayTimes = {
   morning: "morning" as const,
   day: "day" as const,
   evening: "evening" as const,
@@ -154,23 +169,23 @@ const Scene = ({
   const dayTime:DayTime = DayTimes.night as DayTime
 
   const fogColors = {
-    morning: "#EEEEF7",
-    day: "#F6F6F6",
-    evening: "#FFECE1",
-    night: "#171720"
+    morning: hexToRgb("#EEEEF7"),
+    day: hexToRgb("#F6F6F6"),
+    evening: hexToRgb("#FFECE1"),
+    night: hexToRgb("#171720"),
   };
 
   type WeatherState = {
     fog: {
-      color: ColorRepresentation;
+      color: [r: number, g: number, b: number];
       near?: number | undefined;
       far?: number | undefined;
     };
   };
   const weatherState: WeatherState = {
-    fog: { color: fogColors[dayTime], near: 10, far: 50 }
+    fog: { color: fogColors[dayTime], near: 40, far: 500 }
   };
-  const fogArgs: [color: ColorRepresentation, near?: number | undefined, far?: number | undefined] = [
+  const fogArgs: [color: [r: number, g: number, b: number], near?: number | undefined, far?: number | undefined] = [
     weatherState.fog.color,
     weatherState.fog.near,
     weatherState.fog.far
@@ -201,9 +216,10 @@ const Scene = ({
         <Bloom luminanceThreshold={1} mipmapBlur />
       </EffectComposer> */}
 
+{/* @ts-ignore  */}
       <fog attach="fog" args={fogArgs} />
-      {/* <color attach="background" args={["#ffffff"]} /> */}
-      <color attach="background" args={[backgroundColor]} />
+      <color attach="background" args={backgroundColor as [r: number, g: number, b: number]} />
+      {/* <color attach="background" args={[200,150,255]} /> */}
       <ambientLight intensity={globalIlluminationIntensity} />
 
       <spotLight
@@ -260,7 +276,7 @@ const Scene = ({
       </Physics>
 
       <Suspense fallback={null}>
-        {/* <Environment preset="night" /> */}
+        <Environment preset="night" />
       </Suspense>
     </>
   );

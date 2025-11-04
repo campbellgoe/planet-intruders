@@ -42,8 +42,8 @@ type GenerateHeightmapArgs = {
     })
  */
 export function generateHeightmap({
-  width = 128,
-  height = 128,
+  width = 512,
+  height = 512,
   amountOfSeedPoints = 10,
   scale = 1
 }: GenerateHeightmapArgs): number[][] {
@@ -165,12 +165,7 @@ type HeightfieldProps = {
  */
 const Heightfield = ({
   elementSize = 10 / 128,
-  heights = generateHeightmap({
-    height: 128,
-    amountOfSeedPoints: 10,
-    scale: 1,
-    width: 128
-  }),
+  heights = [[0,0,0]],
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   color = "gray"

@@ -9,14 +9,14 @@ import { useMemo } from "react";
 import Heightfield, { generateHeightmap } from "@/components/sceneObjects/HeightField";
 
 const PhysicsScene = () => {
-  const sideScale = 100;
+  const sideScale = 2048;
 
   const heightMapParameters = useMemo(
     () => ({
-      width: 512,
-      height: 512,
-      amountOfSeedPoints: 100,
-      scale: 1
+      width: 128,
+      height: 128,
+      amountOfSeedPoints: 40,
+      scale: 1.5
     }),
     []
   );
@@ -29,9 +29,21 @@ const PhysicsScene = () => {
       <Heightfield
         elementSize={(sideScale * 1) / heightMapParameters.width}
         heights={heights}
-        position={[-sideScale / 2, -10, sideScale / 2]}
+        position={[-sideScale / 2, -20, sideScale / 2]}
         rotation={[-Math.PI / 2, 0, 0]}
       />
+      {/* <Heightfield
+        elementSize={(sideScale * 1) / heightMapParameters.width}
+        heights={heights}
+        position={[-sideScale / 2 - sideScale, -300, sideScale / 2]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      />
+      <Heightfield
+        elementSize={(sideScale * 1) / heightMapParameters.width}
+        heights={heights}
+        position={[-sideScale / 2, -300, sideScale / 2]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      /> */}
 
       {/* TestAreaSurface commented due implementing Heightfield */}
       {/* <TestAreaSurface width={5} height={5} /> */}
@@ -73,9 +85,9 @@ const PhysicsScene = () => {
 
       {/* <Vehicle rotation={[0, -Math.PI / 4, 0]} angularVelocity={[0, 0.5, 0]} /> */}
 
-      <Vehicle playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} />
+      <Vehicle playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} engineForce={5000} color={0x9999ff}/>
 
-       <Vehicle playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} />
+       <Vehicle playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} engineForce={4000} color={0xff9999}/>
 
       {/* debug vehicle wheels */}
       {/* <Cube type='Static'position={[0, 0, 0]} args={[1, 2, 1]} /> */}
