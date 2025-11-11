@@ -27,7 +27,7 @@ import Light from "./Lights";
 import { CompoundBodyProps, CylinderProps } from "@react-three/cannon";
 import { useCameraId } from "../CameraContext";
 import { useFrame } from "@react-three/fiber";
-import { PLAYER_2 } from "../const";
+import { PLAYER_1, PLAYER_2 } from "../const";
 
 const filePath = "/all-terrain-vehicle-chassis.textured.glb";
 
@@ -251,7 +251,7 @@ const Chassis = forwardRef(
       <group ref={ref || undefined} api={api} name="chassis">
         <PerspectiveCamera
           ref={cameraRef}
-          makeDefault={currentCameraId === "following0" || currentCameraId === "following1"}
+          makeDefault={playerIndex === PLAYER_1 && currentCameraId === "following0" || playerIndex === PLAYER_2 && currentCameraId === "following1"}
            position={cameraPosition}
           // fov={cameraFOV}
           target={[0, 0, 0]}
