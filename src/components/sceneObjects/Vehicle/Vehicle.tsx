@@ -31,6 +31,7 @@ const Vehicle = ({
   rotation = [0, 0, 0] as Triplet,
   ...props
 }) => {
+  const [cameraPosition, setCameraPosition] = useState([0,-15,-10])
   const distanceToRotationCenter = frontFirstAxis * Math.tan(maxSteerAxisesRad);
 
   const steerFrontFirstAxisesRad = Math.atan(
@@ -294,7 +295,8 @@ const Vehicle = ({
 
     if (reset) {
       if (chassisRef && chassisRef.current) {
-        chassisRef.current.api.position.set(...position);
+        const [x,_y,z] = chassisRef.current.api.position
+        chassisRef.current.api.position.set([x, position[1], z]);
         chassisRef.current.api.velocity.set(...velocity);
         chassisRef.current.api.angularVelocity.set(...angularVelocity);
         chassisRef.current.api.rotation.set(...rotation);
@@ -317,6 +319,7 @@ const Vehicle = ({
   return (
     <group ref={vehicle || undefined} name="vehicle">
       <Chassis
+      cameraPosition={cameraPosition}
         ref={chassisRef}
         rotation={rotation}
         position={position}

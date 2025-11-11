@@ -1,5 +1,5 @@
 "use client";
-import { CameraControls } from "@react-three/drei";
+import { CameraControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import HUD from "./components/HUD/HUD";
 import { InfoRecordsProvider } from "./components/HUD/InfoPanelContext";
@@ -12,15 +12,15 @@ import "./style.css";
 import LoadingScene from "./components/scenes/LoadingScene";
 
 // import ThreeApp from './Scene'
-const Scene = lazy(() => import("./components/scenes/MainScene"))
+const MainScene = lazy(() => import("./components/scenes/MainScene"))
 const App = () => {
   // const [cameraFOV, setCameraFOV] = useState(75);
   const [cameraFOV, setCameraFOV] = useState(50);
   const [cameraPosition, setCameraPosition] = useState(
-    new Vector3(9.55, 9.33, 15.0)
+    new Vector3(0, -25, 0)
     // new Vector3(0.5, 2, 20.5)
   );
-  const [cameraTarget, setCameraTarget] = useState(new Vector3(2.2, -3.6, 0.6));
+  const [cameraTarget, setCameraTarget] = useState(new Vector3(2.2, -10.6, 0.6));
   const CameraControlsRef = useRef<CameraControls>(null);
 
   const onChangeCamera = (e?: any) => {
@@ -65,15 +65,15 @@ const App = () => {
               >
                 {/* <PerspectiveCamera
                 fov={cameraFOV}
-                makeDefault={currentCameraId === "static"}
-                position={cameraPosition}
+                makeDefault={true}
+                position={[cameraPosition.x, cameraPosition.y, cameraPosition.z]}
               /> */}
                 <Suspense fallback={<LoadingScene />}>
                   <CameraControls
                     ref={CameraControlsRef}
                     onEnd={onChangeCamera}
                   />
-                  <Scene
+                  <MainScene
                     cameraControlsRef={CameraControlsRef}
                     cameraPosition={cameraPosition}
                     cameraTarget={cameraTarget}
