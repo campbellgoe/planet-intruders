@@ -231,7 +231,7 @@ export function useControls() {
   useKeysStateHoldHandler(
     ["r"],
     (draftKeys, pressed) => {
-      (draftKeys.coopPlayerUnit.reset = pressed)
+      // (draftKeys.coopPlayerUnit.reset = pressed)
       void (draftKeys.playerUnit.reset = pressed)
     }
   );

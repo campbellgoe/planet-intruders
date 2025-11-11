@@ -27,7 +27,7 @@ import Light from "./Lights";
 import { CompoundBodyProps, CylinderProps } from "@react-three/cannon";
 import { useCameraId } from "../CameraContext";
 import { useFrame } from "@react-three/fiber";
-import { PLAYER_2 } from "../const";
+import { PLAYER_1, PLAYER_2 } from "../const";
 
 const filePath = "/all-terrain-vehicle-chassis.textured.glb";
 
@@ -37,6 +37,7 @@ type ChassisProps = BoxProps & {
   printCollisionInfo?: boolean;
   color?: number;
   playerIndex: number;
+  cameraPosition: number[];
 };
 
 const Chassis = forwardRef(
@@ -47,6 +48,7 @@ const Chassis = forwardRef(
       printCollisionInfo = false,
       color = 0xffffff,
       playerIndex = 0,
+      cameraPosition = [0,0,0],
       ...props
     }: ChassisProps,
     ref
@@ -222,9 +224,9 @@ const Chassis = forwardRef(
 
     useFrame(() => {
       // useLayoutEffect(() => {
-      // if (currentCameraId !== "following") {
-      //   return;
-      // }
+      if (currentCameraId === "static") {
+        return;
+      }
       const camera = cameraRef?.current as typeof PerspectiveCamera;
       if (!camera) {
         return;
@@ -249,11 +251,10 @@ const Chassis = forwardRef(
       <group ref={ref || undefined} api={api} name="chassis">
         <PerspectiveCamera
           ref={cameraRef}
-          makeDefault={currentCameraId === "following" || currentCameraId === "reversing"}
-          position={[0, 2, currentCameraId === "following" ? -8 : 8]}
-          // position={cameraPosition}
+          makeDefault={playerIndex === PLAYER_1 && currentCameraId === "following0" || playerIndex === PLAYER_2 && currentCameraId === "following1"}
+           position={cameraPosition}
           // fov={cameraFOV}
-          // target={ref?.current?.position || [0, 0, 0]}
+          target={[0, 0, 0]}
         />
 
         {showAxesHelpers && (

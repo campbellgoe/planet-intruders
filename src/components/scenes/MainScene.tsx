@@ -199,11 +199,11 @@ const Scene = ({
       {showPerfomanceInfo && <Perf position="top-left" />}
 
       <PerspectiveCamera
-        makeDefault={currentCameraId === "following" || currentCameraId === "reversing"}
+        makeDefault={currentCameraId === "static"}
         position={cameraPosition.toArray()}
         fov={cameraFOV}
       />
-      <OrbitControls />
+      <OrbitControls position0={cameraPosition.toArray()}/>
 
       {/* <axesHelper position={[0, 0, 0]} name="scene-axes-helper x:0 y:0 z:0" /> */}
 

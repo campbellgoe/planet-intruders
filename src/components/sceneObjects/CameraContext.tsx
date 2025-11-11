@@ -8,14 +8,16 @@ import {
 } from "react";
 
 const cameraIds = {
-  reversing: "reversing" as const,
-  following: "following" as const
+  static: "static" as const,
+  following0: "following0" as const,
+  
+  following1: "following1" as const
 };
 const cameraIdsAsArray = Object.values(cameraIds);
 
 export type CameraId = keyof typeof cameraIds;
 
-const initialCameraId: CameraId = "reversing";
+const initialCameraId: CameraId = "following1";
 
 const CameraContext = createContext<CameraId>(initialCameraId);
 const CameraDispatchContext = createContext<React.Dispatch<CameraAction>>(
@@ -41,20 +43,20 @@ type CameraProviderProps = { children?: JSX.Element };
 
 export function CameraIdProvider({ children }: CameraProviderProps) {
   const [cameraId, dispatch] = useReducer(cameraReducer, initialCameraId);
-
+  
   const { changeCamera } = useControls();
 
   useEffect(() => {
-    // if (!changeCamera) {
-    //   return;
-    // }
+    if (!changeCamera) {
+      return;
+    }
 
     let cameraIndex = cameraIdsAsArray.findIndex((id) => id === cameraId);
     if (cameraIndex === -1) {
       cameraIndex = 0;
     }
 
-    cameraIndex++;
+    cameraIndex = (cameraIndex+1)%cameraIdsAsArray.length;
 
     dispatch({ type: "changed", id: cameraIdsAsArray[cameraIndex] });
   }, [changeCamera]);
