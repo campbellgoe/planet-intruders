@@ -16,7 +16,7 @@ const PhysicsScene = () => {
       width: 128,
       height: 128,
       amountOfSeedPoints: 10,
-      scale: 20,
+      scale: 1,
 
     }),
     []

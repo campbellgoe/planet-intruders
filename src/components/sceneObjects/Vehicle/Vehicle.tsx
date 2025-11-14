@@ -3,7 +3,7 @@ import { RaycastVehiclePublicApi, Triplet, useRaycastVehicle, WheelInfoOptions }
 import { useFrame } from "@react-three/fiber";
 import { /*ControlsContext,*/ useControls } from "@/hooks/useControls";
 import { /*useContext, useEffect,*/ useEffect, useRef, useState } from "react";
-import { Object3D, Vector3 } from "three";
+import { MathUtils, Object3D, Vector3 } from "three";
 import Chassis from "./Chassis";
 import Wheel from "./Wheel";
 import { PLAYER_1, PLAYER_2} from "../const";
@@ -205,18 +205,10 @@ const Vehicle = ({
   const controls = useControls();
   const actualVelocity = useRef<Vector3>(null)
   const totalVelocity = useRef<number>(0)
-  const turnFactor = useRef(1)
-  // const turnAmountT = useRef(0)
-  useEffect(() => {
-    // @ts-ignore
-    (chassisRef?.current?.api).velocity.subscribe((v) => {
-
-      const vec3 = new Vector3(v[0], v[1], v[2])
-      const euclideanDist = vec3.length()
-      // set turn factor as an eighth of the velocity
-      turnFactor.current = euclideanDist/8;
-  })
-  }, [])
+ const turning =  useRef({
+  left: 0,
+  right: 0
+})
   useFrame(() => {
     if (!controls) {
       return;
@@ -239,7 +231,11 @@ const Vehicle = ({
       right = coopRight;
       brake = coopBrake;
     }
-    let turnAmount = 0.5*turnFactor.current
+    turning.current = {
+      left: left ? turning.current.left+1 : 0,// number of times left input has been in
+      right: right ? turning.current.right + 1 : 0,
+    }
+    let turnAmount = turnFactor.current
     for (let e = 0; e < 8; e++) {
       api.applyEngineForce(
         forward || backward
@@ -301,7 +297,7 @@ const Vehicle = ({
 
     if (reset) {
       if (chassisRef && chassisRef.current) {
-        const [x,_y,z] = chassisRef.current.api.position
+        const [x,_y,z] = chassisRef.current.api.position.toArray()
         chassisRef.current.api.position.set([x, position[1], z]);
         chassisRef.current.api.velocity.set(...velocity);
         chassisRef.current.api.angularVelocity.set(...angularVelocity);
@@ -318,7 +314,39 @@ const Vehicle = ({
 
     return new Vector3();
   };
+ const turnFactor = useRef(1)
 
+    
+  // const turnAmountT = useRef(0)
+  useEffect(() => {
+    if (!controls) {
+      return;
+    }
+
+    let {
+      // forward,
+      // backward,
+      left,
+      right,
+      // brake,
+      // reset
+    } = controls.playerUnit;
+    // @ts-ignore
+    // turning.current = { right: right ? 1 : 0, left: left ? 1 : 0 }
+    chassisRef?.current?.api.velocity.subscribe((v) => {
+      const t = turning.current
+
+      // turn amount
+      const amountLeft = MathUtils.lerp(0, 0.6, Math.max(0, Math.min(1, t.left/40)))
+      // console.log(amountLeft)
+      const amountRight = MathUtils.lerp(0, 0.6, Math.max(0, Math.min(1, t.right/40)))
+      const vec3 = new Vector3(v[0], v[1], v[2])
+      const euclideanDist = vec3.length()
+      // set turn factor as an eighth of the velocity
+      turnFactor.current = ((euclideanDist*0.01)**0.5+0.2) + (left ? -amountLeft : right ? amountRight : 0)
+      // console.log(turnFactor.current)
+  })
+  }, [])
   // const [showAxesHelpers, setShowAxesHelpers] = useState(true);
   const [showAxesHelpers, setShowAxesHelpers] = useState(false);
 
