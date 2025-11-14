@@ -15,8 +15,9 @@ const PhysicsScene = () => {
     () => ({
       width: 128,
       height: 128,
-      amountOfSeedPoints: 40,
-      scale: 1.5
+      amountOfSeedPoints: 10,
+      scale: 20,
+
     }),
     []
   );
@@ -85,9 +86,9 @@ const PhysicsScene = () => {
 
       {/* <Vehicle rotation={[0, -Math.PI / 4, 0]} angularVelocity={[0, 0.5, 0]} /> */}
 
-      <Vehicle playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} engineForce={5000} color={0x9999ff}/>
+      <Vehicle playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} engineForce={7000} color={0x9999ff}/>
 
-       <Vehicle playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} engineForce={4000} color={0xff9999}/>
+       <Vehicle playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} engineForce={7000} color={0xff9999}/>
 
       {/* debug vehicle wheels */}
       {/* <Cube type='Static'position={[0, 0, 0]} args={[1, 2, 1]} /> */}
