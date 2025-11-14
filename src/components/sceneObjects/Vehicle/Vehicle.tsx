@@ -1,8 +1,8 @@
-import { Triplet, useRaycastVehicle, WheelInfoOptions } from "@react-three/cannon";
+import { RaycastVehiclePublicApi, Triplet, useRaycastVehicle, WheelInfoOptions } from "@react-three/cannon";
 
 import { useFrame } from "@react-three/fiber";
-import { ControlsContext, useControls } from "@/hooks/useControls";
-import { useContext, useEffect, useRef, useState } from "react";
+import { /*ControlsContext,*/ useControls } from "@/hooks/useControls";
+import { /*useContext, useEffect,*/ useEffect, useRef, useState } from "react";
 import { Object3D, Vector3 } from "three";
 import Chassis from "./Chassis";
 import Wheel from "./Wheel";
@@ -194,7 +194,8 @@ const Vehicle = ({
 
   // for debug ---------------------------------------
   window.vehicle = vehicle;
-  window.vehicleApi = api;
+  const vehicleApi:RaycastVehiclePublicApi = api;
+  window.vehicleApi = vehicleApi
   window.vehiclewheelRefs = raycastVehicleParams.wheels;
   window.vehiclewheelInfos = raycastVehicleParams.wheelInfos;
   window.Vector3 = Vector3;
@@ -202,15 +203,20 @@ const Vehicle = ({
 
   // const controls = useContext(ControlsContext);
   const controls = useControls();
-  // const actualVelocity = useRef<number[]>(null)
-  // const totalVelocity = useRef<number>(0)
-  // useEffect(() => {
-  //   // @ts-ignore
-  //   chassisRef?.current?.api.velocity.subscribe((v: number[]) => {
-  //     actualVelocity.current = v
-  //     totalVelocity.current = v.reduce((acc, curr) => acc + curr, 0)
-  // })
-  // }, [])
+  const actualVelocity = useRef<Vector3>(null)
+  const totalVelocity = useRef<number>(0)
+  const turnFactor = useRef(1)
+  // const turnAmountT = useRef(0)
+  useEffect(() => {
+    // @ts-ignore
+    (chassisRef?.current?.api).velocity.subscribe((v) => {
+
+      const vec3 = new Vector3(v[0], v[1], v[2])
+      const euclideanDist = vec3.length()
+      // set turn factor as an eighth of the velocity
+      turnFactor.current = euclideanDist/8;
+  })
+  }, [])
   useFrame(() => {
     if (!controls) {
       return;
@@ -233,6 +239,7 @@ const Vehicle = ({
       right = coopRight;
       brake = coopBrake;
     }
+    let turnAmount = 0.5*turnFactor.current
     for (let e = 0; e < 8; e++) {
       api.applyEngineForce(
         forward || backward
@@ -241,7 +248,6 @@ const Vehicle = ({
         e
       );
     }
-    let factor = 0.8
     // /moving
 
     // steering
@@ -250,7 +256,7 @@ const Vehicle = ({
     for (let s = 0; s < 2; s++) {
       api.setSteeringValue(
         left || right
-          ? steerFrontSecondAxisAngleRad * (left && !right ? +factor : -factor)
+          ? steerFrontSecondAxisAngleRad * (left && !right ? +turnAmount : -turnAmount)
           : 0,
         s
       );
@@ -259,7 +265,7 @@ const Vehicle = ({
     for (let s = 2; s < 4; s++) {
       api.setSteeringValue(
         left || right
-          ? steerFrontFirstAxisesRad * (left && !right ? +factor : -factor)
+          ? steerFrontFirstAxisesRad * (left && !right ? +turnAmount : -turnAmount)
           : 0,
         s
       );
@@ -270,7 +276,7 @@ const Vehicle = ({
     for (let s = 4; s < 6; s++) {
       api.setSteeringValue(
         left || right
-          ? steerRearSecondAxisAngleRad * (left && !right ? +factor : -factor)
+          ? steerRearSecondAxisAngleRad * (left && !right ? +turnAmount : -turnAmount)
           : 0,
         s
       );
@@ -279,7 +285,7 @@ const Vehicle = ({
     for (let s = 6; s < 8; s++) {
       api.setSteeringValue(
         left || right
-          ? steerReaFirstrAxisesRad * (left && !right ? +factor : -factor)
+          ? steerReaFirstrAxisesRad * (left && !right ? +turnAmount : -turnAmount)
           : 0,
         s
       );
