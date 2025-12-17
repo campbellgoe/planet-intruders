@@ -9,6 +9,7 @@ import Wheel from "./Wheel";
 import { PLAYER_1, PLAYER_2} from "../const";
 
 const Vehicle = ({
+  cameraIndex = 0,
   playerIndex = PLAYER_1,
   wheelRadius = 0.6,
   wheelDepth = 1.2,
@@ -31,7 +32,7 @@ const Vehicle = ({
   rotation = [0, 0, 0] as Triplet,
   ...props
 }) => {
-  const [cameraPosition, setCameraPosition] = useState([0,-15,-10])
+  const [cameraPosition, setCameraPosition] = useState([0,10,0])
   const distanceToRotationCenter = frontFirstAxis * Math.tan(maxSteerAxisesRad);
 
   const steerFrontFirstAxisesRad = Math.atan(
@@ -78,7 +79,7 @@ const Vehicle = ({
     axleLocal: [-1, 0, 0] as Triplet,
     // chassisConnectionPointLocal: [1, 0, 1] as Triplet,
     useCustomSlidingRotationalSpeed: true,
-    customSlidingRotationalSpeed: 6,
+    customSlidingRotationalSpeed: 2,
     // customSlidingRotationalSpeed: 2,
     // customSlidingRotationalSpeed: 30,
     frictionSlip: 2
@@ -192,6 +193,10 @@ const Vehicle = ({
   };
   const [vehicle, api] = useRaycastVehicle(() => raycastVehicleParams);
 
+  if(playerIndex === PLAYER_2){
+    api.applyEngineForce(100, 0)
+    api.applyEngineForce(100, 1)
+  }
   // for debug ---------------------------------------
   window.vehicle = vehicle;
   const vehicleApi:RaycastVehiclePublicApi = api;
@@ -353,6 +358,7 @@ const Vehicle = ({
   return (
     <group ref={vehicle || undefined} name="vehicle">
       <Chassis
+      myIndex={cameraIndex}
       cameraPosition={cameraPosition}
         ref={chassisRef}
         rotation={rotation}

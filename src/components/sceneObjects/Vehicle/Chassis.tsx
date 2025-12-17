@@ -1,4 +1,4 @@
-import { PerspectiveCamera, useGLTF } from "@react-three/drei";
+import { MapControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
 import { ControlsContext, useControls } from "@/hooks/useControls";
 import {
   forwardRef,
@@ -7,7 +7,7 @@ import {
   useRef,
   useState
 } from "react";
-import { Color, Mesh, Vector3 } from "three";
+import { Color, Mesh, MOUSE, Vector3 } from "three";
 import {
   BoxProps,
   CollideEvent,
@@ -38,6 +38,7 @@ type ChassisProps = BoxProps & {
   color?: number;
   playerIndex: number;
   cameraPosition: number[];
+  myIndex: number;
 };
 
 const Chassis = forwardRef(
@@ -49,6 +50,7 @@ const Chassis = forwardRef(
       color = 0xffffff,
       playerIndex = 0,
       cameraPosition = [0,0,0],
+      myIndex,
       ...props
     }: ChassisProps,
     ref
@@ -143,7 +145,8 @@ const Chassis = forwardRef(
     const [showAxesHelpers, setShowAxesHelpers] = useState(false);
 
     const {
-      playerUnit: { lightsOn }
+      playerUnit: { lightsOn },
+      coopPlayerUnit: { lightsOn: p2Lights }
     } = useControls();
     // } = useContext(ControlsContext);
 
@@ -158,7 +161,7 @@ const Chassis = forwardRef(
         emissiveIntensity: 1
       }
     };
-    if (!lightsOn) {
+    if (!lightsOn && playerIndex === PLAYER_1 || !p2Lights && playerIndex === PLAYER_2) {
       headlight.light.intensity = 0;
       headlight.lightSurface.emissiveIntensity = 0;
     }
@@ -224,9 +227,10 @@ const Chassis = forwardRef(
 
     useFrame(() => {
       // useLayoutEffect(() => {
-      if (currentCameraId === "static") {
-        return;
-      }
+      // if (currentCameraId === "static") {
+      //   return;
+      // }
+      const index=  myIndex?.current || 1
       const camera = cameraRef?.current as typeof PerspectiveCamera;
       if (!camera) {
         return;
@@ -236,11 +240,14 @@ const Chassis = forwardRef(
       if (!ref?.current) {
         return;
       }
-      // camera.rotation.set(0, Math.PI, 0);
-      // camera.position.set(0, 10, -20);
-      const chassisPosition = new Vector3();
-      ref?.current.getWorldPosition(chassisPosition);
-      camera.lookAt(chassisPosition);
+
+      if(currentCameraId !== "static"){
+        // camera.rotation.set(0, Math.PI, 0);
+        // camera.position.set(0, 10, -20);
+        const chassisPosition = new Vector3();
+        ref?.current.getWorldPosition(chassisPosition);
+        camera.lookAt(chassisPosition);
+      }
       // camera.lookAt(ref?.current.position);
       // camera.rotation.x -= 0.2;
       // camera.rotation.z = Math.PI; // resolves the weird spin in the beginning
@@ -256,7 +263,25 @@ const Chassis = forwardRef(
           // fov={cameraFOV}
           target={[0, 0, 0]}
         />
-
+<MapControls
+      rotateSpeed={0.5}
+      enableRotate={true}
+      enablePan={true}
+      camera={currentCameraId === "static" ? cameraRef.current : null}
+      makeDefault={currentCameraId === "static"}
+      maxPolarAngle={Math.PI*0.6}
+      minPolarAngle={-Math.PI*0.4}
+      screenSpacePanning={false}
+      /*currentCameraId === "static"}*/
+      dampingFactor={0.03}
+      enableDamping={true}
+      panSpeed={0.5}
+      mouseButtons={{
+          LEFT: MOUSE.ROTATE,
+          MIDDLE: MOUSE.DOLLY,
+          RIGHT: MOUSE.PAN
+        }}
+      />
         {showAxesHelpers && (
           <axesHelper
             name="chassis-helper"

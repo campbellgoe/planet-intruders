@@ -16,12 +16,10 @@ const HUD = ({ cameraPosition, cameraTarget }: ScreenInterfaceProps) => {
     <>
       <InfoRecords />
       <KeymapInfo />
-      {showCameraInfo && (
-        <CameraInfo
-          cameraPosition={cameraPosition}
-          cameraTarget={cameraTarget}
-        />
-      )}
+      <CameraInfo
+        cameraPosition={cameraPosition}
+        cameraTarget={cameraTarget}
+      />
     </>
   );
 };

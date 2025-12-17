@@ -5,10 +5,14 @@ import TestAreaBrickWallWithColumns from "@/components/sceneObjects/TestAreaBric
 import TestAreaGroundBlocks from "@/components/sceneObjects/TestAreaGroundBlocks";
 import TestAreaSurface from "@/components/sceneObjects/TestAreaSurface";
 import Vehicle from "@/components/sceneObjects/Vehicle/Vehicle";
-import { useMemo } from "react";
+import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import Heightfield, { generateHeightmap } from "@/components/sceneObjects/HeightField";
+import { useGLTF } from "@react-three/drei";
+import { useTrimesh } from "@react-three/cannon";
+import { BufferAttribute, Mesh, Object3D, Vector3 } from "three";
 
-const PhysicsScene = () => {
+const PhysicsScene = ({ myIndex = 0 }: {myIndex: number}) => {
+
   const sideScale = 2048;
 
   const heightMapParameters = useMemo(
@@ -24,7 +28,40 @@ const PhysicsScene = () => {
   const heights = useMemo(() => generateHeightmap(heightMapParameters), [
     heightMapParameters
   ]);
+const { scene, nodes } = useGLTF('/snowy_mountain_-_terrain.glb')
+    console.log('Mountain nodes', nodes)
+    const levelProps = {}
+    // const [meshes, setMeshes] = useState<{ Mesh: Mesh, points: any, indices: any}[]>([])
+    // console.log('meshes', meshes)
+    
+    const items =useMemo(() => {
+      let v = new Vector3();
+      let meshes: Mesh[] = []
+      scene.traverse((e: Object3D<any>)=>e.isMesh && meshes.push(e));
+      
+      return meshes.map(mesh=>{
+      let g = mesh.geometry;
+        let points = g.attributes.position.array || [];
+        let indices = g.index?.array || [];
+        return {
+          Mesh: mesh,
+          points,
+          indices: indices,
 
+        }
+      })
+    }, [scene])
+    const [ref, api] = useTrimesh(
+      () => ({
+        args: [
+          items?.[2]?.points || [],
+          items?.[2]?.indices || [],
+        ],
+        mass: 0,
+        ...levelProps,
+      }),
+      useRef(null)
+    )
   return (
     <>
       <Heightfield
@@ -86,12 +123,14 @@ const PhysicsScene = () => {
 
       {/* <Vehicle rotation={[0, -Math.PI / 4, 0]} angularVelocity={[0, 0.5, 0]} /> */}
 
-      <Vehicle playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} engineForce={7000} color={0x9999ff}/>
+      <Vehicle cameraIndex={myIndex} playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} engineForce={4000} color={0xff0000}/>
 
-       <Vehicle playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} engineForce={7000} color={0xff9999}/>
+       <Vehicle cameraIndex={myIndex}  playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} engineForce={4000} color={0x00ff44}/>
 
       {/* debug vehicle wheels */}
       {/* <Cube type='Static'position={[0, 0, 0]} args={[1, 2, 1]} /> */}
+      {/* gltf */}
+      <primitive object={scene} scale={1000} ref={ref} position={[0.04, 0.04,0.04]}/>
     </>
   );
 };

@@ -1,7 +1,8 @@
 import {
   CameraControls,
   Environment,
-  OrbitControls,
+  MapControls,
+  // OrbitControls,
   Stats
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
@@ -16,7 +17,7 @@ import {
   useRef,
   useState
 } from "react";
-import { ColorRepresentation, Vector3 } from "three";
+import { MOUSE, Vector3 } from "three";
 import { PerspectiveCamera } from "@react-three/drei";
 import { Debug as CannonDebugger, Physics } from "@react-three/cannon";
 import { useCameraId } from "@/components/sceneObjects/CameraContext";
@@ -34,8 +35,8 @@ const hexToRgb = (hex: string): [r: number, g: number, b: number] => {
     ,
     ((h & (alpha ? 0x0000ff00 : 0x0000ff)) >>> (alpha ? 8 : 0))
     ,
-    ]
-    // (alpha ? `, ${h & 0x000000ff}` : '')
+  ]
+  // (alpha ? `, ${h & 0x000000ff}` : '')
   //);
 };
 export const DebuggerColorIdByName = {
@@ -81,13 +82,15 @@ type SceneProps = {
   cameraPosition: Vector3;
   cameraTarget: Vector3;
   cameraFOV: number;
+  myIndexRef: RefObject<number>
 };
 
 const Scene = ({
   cameraControlsRef,
   cameraPosition = new Vector3(),
   cameraTarget = new Vector3(),
-  cameraFOV = 50
+  cameraFOV = 50,
+  myIndexRef
 }: SceneProps) => {
   const currentCameraId = useCameraId();
 
@@ -118,7 +121,7 @@ const Scene = ({
       return;
     }
 
-    // cameraControlsRef.current.setTarget(...cameraTarget.toArray());
+    cameraControlsRef.current.setTarget(...cameraTarget.toArray());
     cameraControlsRef.current.setLookAt(
       ...cameraPosition.toArray(),
       ...cameraTarget.toArray()
@@ -166,7 +169,7 @@ const Scene = ({
   // const dayTime:DayTime = DayTimes.morning as DayTime
   // const dayTime: DayTime = DayTimes.day as DayTime
   // const dayTime:DayTime = DayTimes.evening as DayTime
-  const dayTime:DayTime = DayTimes.night as DayTime
+  const dayTime: DayTime = DayTimes.night as DayTime
 
   const fogColors = {
     morning: hexToRgb("#EEEEF7"),
@@ -192,18 +195,82 @@ const Scene = ({
   ];
   const backgroundColor = weatherState.fog.color;
   const globalIlluminationIntensity = dayTime === DayTimes.day ? 0.3 : 0.05
+  const mapControlsRef = useRef<typeof MapControls>(null)
+  // function updateCamera( )
+  // {
+  //   const camera = myCam.current
+  //   if(camera){
+  // 		// camera.position.setFromSphericalCoords( cameraDistance, 1, cameraAngle );
+  // 		// camera.position.add( cameraTarget );
+  // 		camera.lookAt( cameraTarget );
+  //   }
+  // }
+  // useEffect(() => {
+  // if(currentCameraId === "static"){
+  //   updateCamera()
+  // }
+  // }, [currentCameraId])
+  const myCam = useRef<any>(null)
+  // useEffect(() => {
+  //   const cam = myCam.current
+  //   if(cam){
+  //     const controls = mapControlsRef.current
+  //     if(controls){
+  //     controls.target.set(0, 0, -2);
+  //     }
+  // cam.position.y = 5;
+  //   }
+  // }, [])
+  const mouseDrag = useRef(false);
+  // const cameraTarget = useRef(new Vector3()),
+  const cameraAngle = useRef(0)
+  const cameraDistance = useRef(10)
+
+  // capture mouse events
+
+  useEffect(() => {
+    window.addEventListener('pointerdown', () => mouseDrag.current = true);
+    window.addEventListener('pointerup', () => mouseDrag.current = false);
+    window.addEventListener('pointermove', onPointerMove);
+  }, [])
+
+
+
+  // handle mouse motion
+
+  function onPointerMove(event: PointerEvent) {
+    // exit is no button is pressed
+    if (!mouseDrag.current) return;
+
+    // either rotate or pan, which ever movement is larger
+    if (Math.abs(event.movementX) > Math.abs(event.movementY)) {
+      // only rotate, 0.01 is the speed of rotation
+      cameraAngle.current += 0.01 * event.movementX;
+    } else {
+      // only move, 0.01 is the speed of panning
+      cameraTarget.x -= 0.01 * event.movementY * Math.sin(cameraAngle.current);
+      cameraTarget.z -= 0.01 * event.movementY * Math.cos(cameraAngle.current);
+
+      // targetImage.position.copy( cameraTarget );
+    }
+  }
 
   return (
     <>
-      {showFPSStats && <Stats/>}
+      {showFPSStats && <Stats />}
       {showPerfomanceInfo && <Perf position="top-left" />}
 
-      <PerspectiveCamera
+      {/* <PerspectiveCamera
         makeDefault={currentCameraId === "static"}
         position={cameraPosition.toArray()}
         fov={cameraFOV}
-      />
-      <OrbitControls position0={cameraPosition.toArray()}/>
+        ref={node => {
+          if (node) {
+            myCam.current = node
+          }
+        }}
+      /> */}
+
 
       {/* <axesHelper position={[0, 0, 0]} name="scene-axes-helper x:0 y:0 z:0" /> */}
 
@@ -216,7 +283,7 @@ const Scene = ({
         <Bloom luminanceThreshold={1} mipmapBlur />
       </EffectComposer> */}
 
-{/* @ts-ignore  */}
+      {/* @ts-ignore  */}
       <fog attach="fog" args={fogArgs} />
       <color attach="background" args={backgroundColor as [r: number, g: number, b: number]} />
       {/* <color attach="background" args={[200,150,255]} /> */}
@@ -255,10 +322,10 @@ const Scene = ({
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
         shadow-bias={-0.0001} // slightly visible "peter-panning" effect of standing on the surface objects
-        //
-        // shadow-mapSize-width={512}
-        // shadow-mapSize-height={512}
-        // shadow-bias={-0.00015} // noticeable "peter-panning" effect
+      //
+      // shadow-mapSize-width={512}
+      // shadow-mapSize-height={512}
+      // shadow-bias={-0.00015} // noticeable "peter-panning" effect
       />
 
       <Physics
@@ -269,10 +336,10 @@ const Scene = ({
       >
         {isActiveCurrentCannonDebuggerState && (
           <CannonDebugger color={cannonDebuggerColor}>
-            <PhysicsScene />
+            <PhysicsScene myIndex={myIndexRef.current}/>
           </CannonDebugger>
         )}
-        {!isActiveCurrentCannonDebuggerState && <PhysicsScene />}
+        {!isActiveCurrentCannonDebuggerState && <PhysicsScene myIndex={myIndexRef.current}/>}
       </Physics>
 
       <Suspense fallback={null}>
