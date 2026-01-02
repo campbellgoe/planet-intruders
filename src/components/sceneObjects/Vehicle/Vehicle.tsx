@@ -2,13 +2,15 @@ import { RaycastVehiclePublicApi, Triplet, useRaycastVehicle, WheelInfoOptions }
 
 import { useFrame } from "@react-three/fiber";
 import { /*ControlsContext,*/ useControls } from "@/hooks/useControls";
-import { /*useContext, useEffect,*/ useEffect, useRef, useState } from "react";
+import { /*useContext, useEffect,*/ RefObject, useEffect, useRef, useState } from "react";
 import { MathUtils, Object3D, Vector3 } from "three";
 import Chassis from "./Chassis";
 import Wheel from "./Wheel";
 import { PLAYER_1, PLAYER_2} from "../const";
+import { PerspectiveCamera } from "@react-three/drei";
 
 const Vehicle = ({
+  cameraRef,
   cameraIndex = 0,
   playerIndex = PLAYER_1,
   wheelRadius = 0.6,
@@ -31,7 +33,7 @@ const Vehicle = ({
   angularVelocity = [0, 0, 0] as Triplet,
   rotation = [0, 0, 0] as Triplet,
   ...props
-}) => {
+}: any & {cameraRef: RefObject<typeof PerspectiveCamera>}) => {
   const [cameraPosition, setCameraPosition] = useState([0,10,0])
   const distanceToRotationCenter = frontFirstAxis * Math.tan(maxSteerAxisesRad);
 
@@ -360,6 +362,7 @@ const Vehicle = ({
       <Chassis
       myIndex={cameraIndex}
       cameraPosition={cameraPosition}
+        cameraRef={cameraRef}
         ref={chassisRef}
         rotation={rotation}
         position={position}

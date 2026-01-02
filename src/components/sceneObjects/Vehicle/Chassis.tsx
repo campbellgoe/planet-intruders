@@ -1,20 +1,21 @@
-import { MapControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
+import { MapControls, OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
 import { ControlsContext, useControls } from "@/hooks/useControls";
 import {
-  forwardRef,
+  RefObject,
   useContext,
   useLayoutEffect,
   useRef,
   useState
 } from "react";
-import { Color, Mesh, MOUSE, Vector3 } from "three";
+import { Color, Object3D, OrthographicCamera, Vector3 } from "three";
 import {
   BoxProps,
   CollideEvent,
   Triplet,
   useBox,
   useCompoundBody,
-  useTrimesh
+  useTrimesh,
+  CompoundBodyProps
 } from "@react-three/cannon";
 import {
   CHASSIS,
@@ -24,7 +25,6 @@ import {
   WHEEL
 } from "../ObjectCollisionTypes";
 import Light from "./Lights";
-import { CompoundBodyProps, CylinderProps } from "@react-three/cannon";
 import { useCameraId } from "../CameraContext";
 import { useFrame } from "@react-three/fiber";
 import { PLAYER_1, PLAYER_2 } from "../const";
@@ -39,343 +39,323 @@ type ChassisProps = BoxProps & {
   playerIndex: number;
   cameraPosition: number[];
   myIndex: number;
+  ref?: RefObject<Object3D<Event> | null>
+  cameraRef: RefObject<typeof PerspectiveCamera | typeof OrthographicCamera>
 };
 
-const Chassis = forwardRef(
-  (
-    {
-      args = [1.65, 0.8, 4],
-      mass = 5000,
-      printCollisionInfo = false,
-      color = 0xffffff,
-      playerIndex = 0,
-      cameraPosition = [0,0,0],
-      myIndex,
-      ...props
-    }: ChassisProps,
-    ref
-  ) => {
-    const { nodes, materials } = useGLTF(filePath);
+const Chassis = (
+  {
+    ref,
+    args = [1.65, 0.8, 4],
+    mass = 5000,
+    printCollisionInfo = false,
+    color = 0xffffff,
+    playerIndex = 0,
+    cameraPosition = [0, 0, 0],
+    myIndex,
+    ...props
+  }: ChassisProps,
+) => {
+  const { nodes, materials } = useGLTF(filePath);
+const cameraRef = useRef(null)
+  const onCollideHandler = function (e: CollideEvent) {
+    if (
+      e.body.name !== "pillar" &&
+      e.body.name !== "cube" &&
+      e.target.name === "surface-for-paint"
+    ) {
+      debugger;
+    }
+    // if (e.body.userData.id === "floor_0:0:0") {
+    //   // if (e.body.userData.id === "wheel-front-first-axis-left") {
+    //   // console.log("collision with wheel", e.body.userData);
+    //   // console.log(arguments);
+    //   if (logs.length < 10) {
+    //     logs.push({ e, arguments });
+    //   }
+    // }
+  };
 
-    const onCollideHandler = function (e: CollideEvent) {
-      if (
-        e.body.name !== "pillar" &&
-        e.body.name !== "cube" &&
-        e.target.name === "surface-for-paint"
-      ) {
-        debugger;
+  // const chassisBoxOptions = {
+  //   mass,
+  //   args,
+  //   allowSleep: false,
+  //   collisionFilterGroup: CHASSIS,
+  //   collisionFilterMask: CHASSIS | WHEEL | SURFACE_FOR_PAINT | PILLAR | CUBE,
+  //   ...props
+  // };
+
+  let chassisCompoundBodyOptions: CompoundBodyProps = {
+    mass,
+    allowSleep: false,
+    collisionFilterGroup: CHASSIS,
+    collisionFilterMask: CHASSIS | WHEEL | SURFACE_FOR_PAINT | PILLAR | CUBE,
+    shapes: [
+      {
+        // top half
+        type: "Box",
+        position: [0, 0, 0],
+        args
       }
-      // if (e.body.userData.id === "floor_0:0:0") {
-      //   // if (e.body.userData.id === "wheel-front-first-axis-left") {
-      //   // console.log("collision with wheel", e.body.userData);
-      //   // console.log(arguments);
-      //   if (logs.length < 10) {
-      //     logs.push({ e, arguments });
-      //   }
+      // note. dont use lower part physics colliders tщ make driving easier
+      // {
+      //   // front part of bottom half
+      //   type: "Cylinder",
+      //   rotation: [(-halfMathPI / 4) * 0.7, 0, halfMathPI],
+      //   position: [0, -0.49, 1.66],
+      //   args: [0.35, 0.35, 0.85, 4]
+      // },
+      // {
+      //   // middle part of bottom half
+      //   type: "Box",
+      //   position: [0, -0.57, 0],
+      //   args: [0.85, 0.5, 3.51]
+      // },
+      // {
+      //   // rear part of bottom half
+      //   type: "Cylinder",
+      //   rotation: [(+halfMathPI / 4) * 0.7, 0, halfMathPI],
+      //   position: [0, -0.49, -1.66],
+      //   args: [0.35, 0.35, 0.85, 4]
       // }
-    };
+    ],
+    ...props
+  };
 
-    // const chassisBoxOptions = {
-    //   mass,
-    //   args,
-    //   allowSleep: false,
-    //   collisionFilterGroup: CHASSIS,
-    //   collisionFilterMask: CHASSIS | WHEEL | SURFACE_FOR_PAINT | PILLAR | CUBE,
-    //   ...props
-    // };
+  if (printCollisionInfo) {
+    chassisCompoundBodyOptions.onCollide = onCollideHandler;
+  }
 
-    let chassisCompoundBodyOptions: CompoundBodyProps = {
-      mass,
-      allowSleep: false,
-      collisionFilterGroup: CHASSIS,
-      collisionFilterMask: CHASSIS | WHEEL | SURFACE_FOR_PAINT | PILLAR | CUBE,
-      shapes: [
-        {
-          // top half
-          type: "Box",
-          position: [0, 0, 0],
-          args
-        }
-        // note. dont use lower part physics colliders tщ make driving easier
-        // {
-        //   // front part of bottom half
-        //   type: "Cylinder",
-        //   rotation: [(-halfMathPI / 4) * 0.7, 0, halfMathPI],
-        //   position: [0, -0.49, 1.66],
-        //   args: [0.35, 0.35, 0.85, 4]
-        // },
-        // {
-        //   // middle part of bottom half
-        //   type: "Box",
-        //   position: [0, -0.57, 0],
-        //   args: [0.85, 0.5, 3.51]
-        // },
-        // {
-        //   // rear part of bottom half
-        //   type: "Cylinder",
-        //   rotation: [(+halfMathPI / 4) * 0.7, 0, halfMathPI],
-        //   position: [0, -0.49, -1.66],
-        //   args: [0.35, 0.35, 0.85, 4]
-        // }
-      ],
-      ...props
-    };
+  const [_, api] = useCompoundBody(() => chassisCompoundBodyOptions, ref);
+  // const [_boxRef, api] = useBox<Mesh>(() => chassisBoxOptions, ref);
 
-    if (printCollisionInfo) {
-      chassisCompoundBodyOptions.onCollide = onCollideHandler;
+  const steelMaterial = materials["Paint.Gray"];
+  steelMaterial.vertexColors = true
+
+  const windowMaterial = materials["Black plastic"];
+
+  // const { showWireframe } = useControls();
+  // const { showWireframe } = useContext(ControlsContext);
+
+  // (nodes.Cube002 as unknown as Mesh).material.wireframe = showWireframe;
+  // (nodes.Cube002_1 as unknown as Mesh).material.wireframe = showWireframe;
+
+  const { position } = props;
+
+  // const [showAxesHelpers, setShowAxesHelpers] = useState(true);
+  const [showAxesHelpers, setShowAxesHelpers] = useState(false);
+
+  const {
+    playerUnit: { lightsOn },
+    coopPlayerUnit: { lightsOn: p2Lights }
+  } = useControls();
+  // } = useContext(ControlsContext);
+
+  const headlight = {
+    boxSize: [0.5, 0.05, 0.025] as Triplet,
+    light: {
+      position: [0, 0, 0] as Triplet,
+      intensity: 1
+    },
+    lightSurface: {
+      borderWidthPercentage: 5,
+      emissiveIntensity: 1
+    }
+  };
+  if (!lightsOn && playerIndex === PLAYER_1 || !p2Lights && playerIndex === PLAYER_2) {
+    headlight.light.intensity = 0;
+    headlight.lightSurface.emissiveIntensity = 0;
+  }
+
+  const stoplight = {
+    boxSize: [0.05, 0.5, 0.075] as Triplet,
+    light: {
+      position: [0, -0.5, 0] as Triplet,
+      color: "#ff0000",
+      intensity: 0.3,
+      distance: 3
+    },
+    lightSurface: {
+      borderWidthPercentage: 25,
+      emissiveColor: "#ff0000",
+      emissiveIntensity: 0.1
+    }
+  };
+  if (!lightsOn) {
+    stoplight.light.intensity = 0;
+    stoplight.lightSurface.emissiveIntensity = 0;
+  }
+
+  let {
+    playerUnit: { forward, backward, brake },
+    coopPlayerUnit: { backward: coopBackward, brake: coopBrake }
+    // coopPlayerUnit: { forward: coopForward, backward: coopBackward, brake: coopBrake }
+  } = useControls();
+
+  if (playerIndex === PLAYER_2) {
+    backward = coopBackward;
+    brake = coopBrake;
+  }
+  // } = useContext(ControlsContext);
+  // braking
+  if (brake) {
+    stoplight.light.intensity = 1;
+    stoplight.lightSurface.emissiveIntensity = 0.7;
+  }
+
+  const reverselight = {
+    boxSize: [0.05, 0.15, 0.075] as Triplet,
+    light: {
+      position: [0, -0.5, 0] as Triplet,
+      color: color,
+      intensity: 0,
+      distance: 3
+    },
+    lightSurface: {
+      borderWidthPercentage: 25,
+      emissiveColor: color,
+      emissiveIntensity: 0
+    }
+  };
+  // reverse moving
+  if (backward) {
+    reverselight.light.intensity = 1;
+    reverselight.lightSurface.emissiveIntensity = 0.7;
+  }
+  // debugger;
+  const currentCameraId = useCameraId();
+
+  useFrame(() => {
+    // useLayoutEffect(() => {
+    // if (currentCameraId === "static") {
+    //   return;
+    // }
+    const index = myIndex?.current || 1
+    const camera = cameraRef?.current as typeof PerspectiveCamera;
+    if (!camera) {
+      return;
+    }
+    // debugger; /// <<<<>>>>
+
+    if (!ref?.current) {
+      return;
     }
 
-    const [_, api] = useCompoundBody(() => chassisCompoundBodyOptions, ref);
-    // const [_boxRef, api] = useBox<Mesh>(() => chassisBoxOptions, ref);
-
-    const steelMaterial = materials["Paint.Gray"];
-    steelMaterial.vertexColors = true
-    
-    const windowMaterial = materials["Black plastic"];
-
-    // const { showWireframe } = useControls();
-    // const { showWireframe } = useContext(ControlsContext);
-
-    // (nodes.Cube002 as unknown as Mesh).material.wireframe = showWireframe;
-    // (nodes.Cube002_1 as unknown as Mesh).material.wireframe = showWireframe;
-
-    const { position } = props;
-
-    // const [showAxesHelpers, setShowAxesHelpers] = useState(true);
-    const [showAxesHelpers, setShowAxesHelpers] = useState(false);
-
-    const {
-      playerUnit: { lightsOn },
-      coopPlayerUnit: { lightsOn: p2Lights }
-    } = useControls();
-    // } = useContext(ControlsContext);
-
-    const headlight = {
-      boxSize: [0.5, 0.05, 0.025] as Triplet,
-      light: {
-        position: [0, 0, 0] as Triplet,
-        intensity: 1
-      },
-      lightSurface: {
-        borderWidthPercentage: 5,
-        emissiveIntensity: 1
-      }
-    };
-    if (!lightsOn && playerIndex === PLAYER_1 || !p2Lights && playerIndex === PLAYER_2) {
-      headlight.light.intensity = 0;
-      headlight.lightSurface.emissiveIntensity = 0;
+    if (currentCameraId !== "static") {
+      // camera.rotation.set(0, Math.PI, 0);
+      // camera.position.set(0, 10, -20);
+      const chassisPosition = new Vector3();
+      ref?.current.getWorldPosition(chassisPosition);
+      camera.lookAt(chassisPosition);
     }
+    // camera.lookAt(ref?.current.position);
+    // camera.rotation.x -= 0.2;
+    // camera.rotation.z = Math.PI; // resolves the weird spin in the beginning
+    // }, [currentCameraId, cameraRef, ref]);
+  });
 
-    const stoplight = {
-      boxSize: [0.05, 0.5, 0.075] as Triplet,
-      light: {
-        position: [0, -0.5, 0] as Triplet,
-        color: "#ff0000",
-        intensity: 0.3,
-        distance: 3
-      },
-      lightSurface: {
-        borderWidthPercentage: 25,
-        emissiveColor: "#ff0000",
-        emissiveIntensity: 0.1
-      }
-    };
-    if (!lightsOn) {
-      stoplight.light.intensity = 0;
-      stoplight.lightSurface.emissiveIntensity = 0;
-    }
-
-    let {
-      playerUnit: { forward, backward, brake },
-      coopPlayerUnit: { backward: coopBackward, brake: coopBrake }
-      // coopPlayerUnit: { forward: coopForward, backward: coopBackward, brake: coopBrake }
-    } = useControls();
-
-    if (playerIndex === PLAYER_2) {
-      backward = coopBackward;
-      brake = coopBrake;
-    }
-    // } = useContext(ControlsContext);
-    // braking
-    if (brake) {
-      stoplight.light.intensity = 1;
-      stoplight.lightSurface.emissiveIntensity = 0.7;
-    }
-
-    const reverselight = {
-      boxSize: [0.05, 0.15, 0.075] as Triplet,
-      light: {
-        position: [0, -0.5, 0] as Triplet,
-        color: color,
-        intensity: 0,
-        distance: 3
-      },
-      lightSurface: {
-        borderWidthPercentage: 25,
-        emissiveColor: color,
-        emissiveIntensity: 0
-      }
-    };
-    // reverse moving
-    if (backward) {
-      reverselight.light.intensity = 1;
-      reverselight.lightSurface.emissiveIntensity = 0.7;
-    }
-    // debugger;
-    const currentCameraId = useCameraId();
-    const cameraRef = useRef<typeof PerspectiveCamera>(null);
-
-    useFrame(() => {
-      // useLayoutEffect(() => {
-      // if (currentCameraId === "static") {
-      //   return;
-      // }
-      const index=  myIndex?.current || 1
-      const camera = cameraRef?.current as typeof PerspectiveCamera;
-      if (!camera) {
-        return;
-      }
-      // debugger; /// <<<<>>>>
-
-      if (!ref?.current) {
-        return;
-      }
-
-      if(currentCameraId !== "static"){
-        // camera.rotation.set(0, Math.PI, 0);
-        // camera.position.set(0, 10, -20);
-        const chassisPosition = new Vector3();
-        ref?.current.getWorldPosition(chassisPosition);
-        camera.lookAt(chassisPosition);
-      }
-      // camera.lookAt(ref?.current.position);
-      // camera.rotation.x -= 0.2;
-      // camera.rotation.z = Math.PI; // resolves the weird spin in the beginning
-      // }, [currentCameraId, cameraRef, ref]);
-    });
-
-    return (
-      <group ref={ref || undefined} api={api} name="chassis">
-        <PerspectiveCamera
-          ref={cameraRef}
-          makeDefault={playerIndex === PLAYER_1 && currentCameraId === "following0" || playerIndex === PLAYER_2 && currentCameraId === "following1"}
-           position={cameraPosition}
-          // fov={cameraFOV}
-          target={[0, 0, 0]}
-        />
-<MapControls
-      rotateSpeed={0.5}
-      enableRotate={true}
-      enablePan={true}
-      camera={currentCameraId === "static" ? cameraRef.current : null}
-      makeDefault={currentCameraId === "static"}
-      maxPolarAngle={Math.PI*0.6}
-      minPolarAngle={-Math.PI*0.4}
-      screenSpacePanning={false}
-      /*currentCameraId === "static"}*/
-      dampingFactor={0.03}
-      enableDamping={true}
-      panSpeed={0.5}
-      mouseButtons={{
-          LEFT: MOUSE.ROTATE,
-          MIDDLE: MOUSE.DOLLY,
-          RIGHT: MOUSE.PAN
-        }}
+  return (
+    <group ref={ref || undefined} api={api} name="chassis">
+      <PerspectiveCamera
+        ref={cameraRef}
+        makeDefault={playerIndex === PLAYER_1 && currentCameraId === "following0" || playerIndex === PLAYER_2 && currentCameraId === "following1"}
+        position={cameraPosition}
+        // fov={cameraFOV}
+        target={[0, 0, 0]}
       />
-        {showAxesHelpers && (
-          <axesHelper
-            name="chassis-helper"
-            position={position}
-            // position={_boxRef.current?.position.toArray()}
-          />
-        )}
+      {showAxesHelpers && (
+        <axesHelper
+          name="chassis-helper"
+          position={position}
+        // position={_boxRef.current?.position.toArray()}
+        />
+      )}
 
-        {/* headlights */}
-        <Light
-          name="headlight-left"
-          args={headlight.boxSize}
-          position={[-0.4, 0.3, 1.95]}
-          light={headlight.light}
-          lightSurface={headlight.lightSurface}
-        />
-        <Light
-          name="headlight-right"
-          args={headlight.boxSize}
-          position={[0.4, 0.3, 1.95]}
-          light={headlight.light}
-          lightSurface={headlight.lightSurface}
-        />
-        {/* /headlights */}
+      {/* headlights */}
+      <Light
+        name="headlight-left"
+        args={headlight.boxSize}
+        position={[-0.4, 0.3, 1.95]}
+        light={headlight.light}
+        lightSurface={headlight.lightSurface}
+      />
+      <Light
+        name="headlight-right"
+        args={headlight.boxSize}
+        position={[0.4, 0.3, 1.95]}
+        light={headlight.light}
+        lightSurface={headlight.lightSurface}
+      />
+      {/* /headlights */}
 
-        {/* stoplights */}
-        <Light
-          name="stoplights-left"
-          args={stoplight.boxSize}
-          light={stoplight.light}
-          color={stoplight.color}
-          lightSurface={stoplight.lightSurface}
-          position={[-0.75, 0, -1.95]}
-          rotation={[0, Math.PI, 0]}
-        />
-        <Light
-          name="stoplights-right"
-          args={stoplight.boxSize}
-          light={stoplight.light}
-          color={stoplight.color}
-          lightSurface={stoplight.lightSurface}
-          position={[0.75, 0, -1.95]}
-          rotation={[0, Math.PI, 0]}
-        />
-        {/* /stoplights */}
+      {/* stoplights */}
+      <Light
+        name="stoplights-left"
+        args={stoplight.boxSize}
+        light={stoplight.light}
+        color={stoplight.color}
+        lightSurface={stoplight.lightSurface}
+        position={[-0.75, 0, -1.95]}
+        rotation={[0, Math.PI, 0]}
+      />
+      <Light
+        name="stoplights-right"
+        args={stoplight.boxSize}
+        light={stoplight.light}
+        color={stoplight.color}
+        lightSurface={stoplight.lightSurface}
+        position={[0.75, 0, -1.95]}
+        rotation={[0, Math.PI, 0]}
+      />
+      {/* /stoplights */}
 
-        {/* reverselights */}
-        <Light
-          name="reverselights-left"
-          args={reverselight.boxSize}
-          light={reverselight.light}
-          color={(new Color(color+(Math.random()*10-5))).toString()}
-          lightSurface={reverselight.lightSurface}
-          position={[-0.7, 0.177, -1.97]}
-          rotation={[0, Math.PI, 0]}
-        />
-        <Light
-          name="reverselights-right"
-          args={reverselight.boxSize}
-          light={reverselight.light}
-          color={(new Color(color)).toString()}
-          lightSurface={reverselight.lightSurface}
-          position={[0.7, 0.177, -1.97]}
-          rotation={[0, Math.PI, 0]}
-        />
-        {/* /reverselights */}
+      {/* reverselights */}
+      <Light
+        name="reverselights-left"
+        args={reverselight.boxSize}
+        light={reverselight.light}
+        color={(new Color(color + (Math.random() * 10 - 5))).toString()}
+        lightSurface={reverselight.lightSurface}
+        position={[-0.7, 0.177, -1.97]}
+        rotation={[0, Math.PI, 0]}
+      />
+      <Light
+        name="reverselights-right"
+        args={reverselight.boxSize}
+        light={reverselight.light}
+        color={(new Color(color)).toString()}
+        lightSurface={reverselight.lightSurface}
+        position={[0.7, 0.177, -1.97]}
+        rotation={[0, Math.PI, 0]}
+      />
+      {/* /reverselights */}
 
-        {/*
+      {/*
         Auto-generated by: https://github.com/pmndrs/gltfjsx
         Command: npx gltfjsx@6.1.4 chassis.glb --transform
         */}
-        <group
-          position={[0, -0.83, 0]}
-          name="chassis-inner-mesh-position-group"
-        >
-          <mesh
-            name="chassis-metallic-parts"
-            castShadow
-            receiveShadow
-            geometry={nodes.Cube002.geometry}
-            material={steelMaterial}
-          />
-          <mesh
-            name="chassis-plastic-parts"
-            castShadow
-            receiveShadow
-            geometry={nodes.Cube002_1.geometry}
-            material={windowMaterial}
-          />
-        </group>
+      <group
+        position={[0, -0.83, 0]}
+        name="chassis-inner-mesh-position-group"
+      >
+        <mesh
+          name="chassis-metallic-parts"
+          castShadow
+          receiveShadow
+          geometry={nodes.Cube002.geometry}
+          material={steelMaterial}
+        />
+        <mesh
+          name="chassis-plastic-parts"
+          castShadow
+          receiveShadow
+          geometry={nodes.Cube002_1.geometry}
+          material={windowMaterial}
+        />
       </group>
-    );
-  }
-);
+    </group>
+  );
+}
 
 useGLTF.preload(filePath);
 

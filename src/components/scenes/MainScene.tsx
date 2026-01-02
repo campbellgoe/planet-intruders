@@ -17,7 +17,7 @@ import {
   useRef,
   useState
 } from "react";
-import { MOUSE, Vector3 } from "three";
+import { Vector3 } from "three";
 import { PerspectiveCamera } from "@react-three/drei";
 import { Debug as CannonDebugger, Physics } from "@react-three/cannon";
 import { useCameraId } from "@/components/sceneObjects/CameraContext";
@@ -255,21 +255,13 @@ const Scene = ({
     }
   }
 
+        const cameraRef = useRef<typeof PerspectiveCamera[]>([]);
   return (
     <>
       {showFPSStats && <Stats />}
       {showPerfomanceInfo && <Perf position="top-left" />}
 
-      {/* <PerspectiveCamera
-        makeDefault={currentCameraId === "static"}
-        position={cameraPosition.toArray()}
-        fov={cameraFOV}
-        ref={node => {
-          if (node) {
-            myCam.current = node
-          }
-        }}
-      /> */}
+      
 
 
       {/* <axesHelper position={[0, 0, 0]} name="scene-axes-helper x:0 y:0 z:0" /> */}
@@ -327,7 +319,17 @@ const Scene = ({
       // shadow-mapSize-height={512}
       // shadow-bias={-0.00015} // noticeable "peter-panning" effect
       />
-
+{<PerspectiveCamera
+        makeDefault={currentCameraId === "static"}
+        position={cameraPosition.toArray()}
+        fov={cameraFOV}
+        ref={node => {
+          if (node) {
+            myCam.current = node
+            cameraRef.current[2] = node
+          }
+        }}
+      />}
       <Physics
         broadphase="SAP"
         // contactEquationRelaxation={4}
@@ -336,10 +338,10 @@ const Scene = ({
       >
         {isActiveCurrentCannonDebuggerState && (
           <CannonDebugger color={cannonDebuggerColor}>
-            <PhysicsScene myIndex={myIndexRef.current}/>
+            <PhysicsScene currentCameraIndex={myIndexRef.current} cameraRef={cameraRef}/>
           </CannonDebugger>
         )}
-        {!isActiveCurrentCannonDebuggerState && <PhysicsScene myIndex={myIndexRef.current}/>}
+        {!isActiveCurrentCannonDebuggerState && <PhysicsScene cameraRef={cameraRef} currentCameraIndex={myIndexRef.current}/>}
       </Physics>
 
       <Suspense fallback={null}>

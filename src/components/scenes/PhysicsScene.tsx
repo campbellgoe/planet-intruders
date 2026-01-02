@@ -7,11 +7,11 @@ import TestAreaSurface from "@/components/sceneObjects/TestAreaSurface";
 import Vehicle from "@/components/sceneObjects/Vehicle/Vehicle";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import Heightfield, { generateHeightmap } from "@/components/sceneObjects/HeightField";
-import { useGLTF } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, useGLTF } from "@react-three/drei";
 import { useTrimesh } from "@react-three/cannon";
-import { BufferAttribute, Mesh, Object3D, Vector3 } from "three";
+import { BufferAttribute, Mesh, MOUSE, Object3D, Vector3 } from "three";
 
-const PhysicsScene = ({ myIndex = 0 }: {myIndex: number}) => {
+const PhysicsScene = ({ cameraRef, currentCameraIndex = 0 }: {cameraRef: RefObject<typeof PerspectiveCamera[]>, currentCameraIndex: number}) => {
 
   const sideScale = 2048;
 
@@ -62,6 +62,8 @@ const { scene, nodes } = useGLTF('/snowy_mountain_-_terrain.glb')
       }),
       useRef(null)
     )
+    const [camTarget, setCamTarget] = useState([0,-20, 0])
+    
   return (
     <>
       <Heightfield
@@ -123,14 +125,15 @@ const { scene, nodes } = useGLTF('/snowy_mountain_-_terrain.glb')
 
       {/* <Vehicle rotation={[0, -Math.PI / 4, 0]} angularVelocity={[0, 0.5, 0]} /> */}
 
-      <Vehicle cameraIndex={myIndex} playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} engineForce={4000} color={0xff0000}/>
+      <Vehicle cameraIndex={currentCameraIndex} playerIndex={0} rotation={[0, -Math.PI / 4, 0]} position={[-2,  2, 0]} engineForce={1400} color={0xff0000}/>
 
-       <Vehicle cameraIndex={myIndex}  playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} engineForce={4000} color={0x00ff44}/>
-
+       <Vehicle cameraIndex={currentCameraIndex}  playerIndex={1} rotation={[0, -Math.PI / 4, 0]} position={[2, 2, 0]} engineForce={1400} color={0x00ff44}/>
+{/* <OrbitControls camera={cameraRef} enablePan={false} target={camTarget}/> */}
       {/* debug vehicle wheels */}
       {/* <Cube type='Static'position={[0, 0, 0]} args={[1, 2, 1]} /> */}
       {/* gltf */}
       <primitive object={scene} scale={1000} ref={ref} position={[0.04, 0.04,0.04]}/>
+
     </>
   );
 };
