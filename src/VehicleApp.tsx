@@ -30,14 +30,10 @@ const currentCameraId = useCameraId()
     }
     if(currentCameraId !== "static"){
       const eventTarget = e.target as CameraControls;
-      setTimeout(() => {
-
     
-      // @ts-ignore
       setCameraPosition(cameraPosition => eventTarget.getPosition(new Vector3(cameraPosition.x, cameraPosition.y, cameraPosition.z)));
-      // @ts-ignore
+
       setCameraTarget(cameraTarget => eventTarget.getTarget(cameraTarget));
-        }, 120)
     }
   };
 
